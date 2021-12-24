@@ -16,15 +16,15 @@ class AuthRepo {
   Future<Auth> register({
     required String email,
     required String password,
-    required String deviceToken,
-
-  }) async => _authApiProvider.register(email: email, password: password, deviceToken: deviceToken);
+    required String username,
+  }) async => _authApiProvider.register(email: email, password: password, username: username);
 
   Future<Auth> login({
     required String email,
     required String password,
+    required String deviceToken,
 
-  }) async => _authApiProvider.login(email: email, password: password);
+  }) async => _authApiProvider.login(email: email, password: password, deviceToken: deviceToken);
 
   Future<GoogleSignInAccount?> googleSignIn() async => _authApiProvider.googleSignIn();
 

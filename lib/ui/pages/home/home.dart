@@ -79,8 +79,7 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
   }
 
   void _getLocation() async {
-    print('test');
-    Position positon = await _geoLocationService.determinePosition();
+    Position positon = await _geoLocationService.determinePosition(context);
     print(positon.latitude);
     print(positon.longitude);
     if(positon != null) {

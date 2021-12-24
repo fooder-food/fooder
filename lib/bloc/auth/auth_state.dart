@@ -15,6 +15,8 @@ class GoogleAuthenticatingState extends AuthState {}
 
 class GoogleAuthenticatedState extends AuthState {}
 
+class RegisterSuccessfulState extends AuthState {}
+
 class AuthenticatedState extends AuthState {
   AuthenticatedState(this.auth);
   final Auth auth;

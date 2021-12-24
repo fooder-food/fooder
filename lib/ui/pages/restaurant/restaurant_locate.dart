@@ -168,14 +168,6 @@ class _FooderRestaurantLocateScreenState extends State<FooderRestaurantLocateScr
     );
   }
 
-  Widget customMapButton() {
-    return Center(
-      child: IconButton(onPressed: () {
-        Navigator.of(context).pushNamed('/map-screen');
-      }, icon: const Icon(Icons.map)),
-    );
-  }
-
   PreferredSizeWidget screenAppBar(AppBarTheme appbarTheme) {
     return AppBar(
       leading: CustomBackbutton(),
@@ -189,9 +181,6 @@ class _FooderRestaurantLocateScreenState extends State<FooderRestaurantLocateScr
       ),
       backgroundColor: appbarTheme.backgroundColor,
       title: Text('Restaurant Location', style: appbarTheme.titleTextStyle,),
-      actions: [
-        customMapButton(),
-      ],
     );
   }
 }

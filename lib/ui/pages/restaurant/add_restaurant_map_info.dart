@@ -24,7 +24,7 @@ class _FooderAddRestaurantMapInfoScreenState extends State<FooderAddRestaurantMa
   final RestaurantLocationRepo _restaurantLocationRepo = RestaurantLocationRepo();
   final GeoLocationService _geoService = GeoLocationService();
   late final RestaurantLocationBloc _restaurantLocationBloc;
-  LatLng? _position;
+  LatLng? _position = const LatLng(37.43296265331129, -122.08832357078792);
   GoogleMapLocation? markedPlace;
   bool buttonDisable = false;
   String defaultAddress = '';
@@ -39,9 +39,7 @@ class _FooderAddRestaurantMapInfoScreenState extends State<FooderAddRestaurantMa
 
   Future<LatLng> _initGoogleMap() async {
     Position position = await _geoService.determinePostionWithOutCheck();
-    setState(() {
-      _position = LatLng(position.latitude, position.longitude);
-    });
+    _position = LatLng(position.latitude, position.longitude);
     // setMarker();
     return LatLng(position.latitude, position.longitude);
   }
@@ -72,18 +70,18 @@ class _FooderAddRestaurantMapInfoScreenState extends State<FooderAddRestaurantMa
                       buttonDisable = true;
                     });
                   },
-                  onPointerUp: (event) {
-                    setState(() async {
-                      buttonDisable = false;
-                      markedPlace = await _restaurantLocationRepo.fetchGoogleMapLocation(
+                  onPointerUp: (event) async {
+                    final result = await _restaurantLocationRepo.fetchGoogleMapLocation(
                           longitude: _position!.longitude.toString(),
                           latitude: _position!.latitude.toString()
                       );
+                    setState(() {
+                      buttonDisable = false;
+                      markedPlace = result;
                     });
                   },
                   child: GoogleMap(
                       myLocationEnabled:false ,
-                      indoorViewEnabled: true,
                       mapType: MapType.normal,
                       zoomGesturesEnabled: true,
                       onCameraMove: (cameraPosition) {

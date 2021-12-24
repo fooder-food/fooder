@@ -22,9 +22,11 @@ class RegisterEvent extends AuthEvent {
    RegisterEvent({
       required this.email,
       required this.password,
+      required this.username,
    });
    final String email;
    final String password;
+   final String username;
 }
 
 class LogoutEvent extends AuthEvent {}

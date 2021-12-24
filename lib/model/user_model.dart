@@ -13,7 +13,6 @@ class User {
     required this.avatarType,
     required this.createDate,
     required this.updateDate,
-    required this.deviceToken,
 });
 
   factory User.fromJson(Map<String, dynamic> json) =>   _$UserFromJson(json);
@@ -26,5 +25,4 @@ class User {
   final String avatarType;
   final DateTime createDate;
   final DateTime updateDate;
-  final String deviceToken;
 }

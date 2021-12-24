@@ -23,7 +23,7 @@ class _FooderEmailLoginScreenState extends State<FooderEmailLoginScreen> {
   Widget build(BuildContext context) {
     final appbarTheme = Theme.of(context).appBarTheme;
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       appBar: screenAppBar(
         appbarTheme,
         appTitle: "",

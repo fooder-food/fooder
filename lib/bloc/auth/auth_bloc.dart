@@ -25,12 +25,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       Emitter<AuthState> emit
       ) async {
     emit(AuthenticatingState());
-    final messaging = FirebaseMessaging.instance;
-    final token = await messaging.getToken();
     String email = event.email;
     String password = event.password;
-    final Auth auth = await _authRepo.register(email: email, password: password, deviceToken: token!);
-    emit(AuthenticatedState(auth));
+    String username = event.username;
+    final Auth auth = await _authRepo.register(
+        email: email,
+        password: password,
+        username: username,
+    );
+    emit(RegisterSuccessfulState());
   }
 
   void _login(
@@ -41,7 +44,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           emit(AuthenticatingState());
           String email = event.email;
           String password = event.password;
-          final Auth auth = await _authRepo.login(email: email, password: password);
+          final messaging = FirebaseMessaging.instance;
+          final token = await messaging.getToken();
+          final Auth auth = await _authRepo.login(email: email, password: password, deviceToken: token!);
           if(auth.user == null) {
             emit(UnAuthenticatedState(auth));
             return;

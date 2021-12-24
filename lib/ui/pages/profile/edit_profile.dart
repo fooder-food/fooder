@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_notification/bloc/profile/profile_repo.dart';
 import 'package:flutter_notification/core/service/storage/storage_service.dart';
 import 'package:flutter_notification/model/auth_model.dart';
@@ -51,7 +49,7 @@ class _FooderEditProfileScreenState extends State<FooderEditProfileScreen> {
     super.dispose();
   }
 
-  void _showActionSheet(BuildContext context) {
+  void  _showActionSheet(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     showAdaptiveActionSheet(
       context: context,

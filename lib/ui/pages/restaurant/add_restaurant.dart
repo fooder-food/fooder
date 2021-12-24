@@ -1,7 +1,9 @@
+import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_notification/core/service/geo/geo_location.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_notification/bloc/add-restaurant/add_restaurant_bloc.dart';
 import 'package:flutter_notification/bloc/restaurant-location/restaurant_location_bloc.dart';
@@ -28,6 +30,7 @@ class _FooderAddRestaurantScreenState extends State<FooderAddRestaurantScreen> {
   late TextEditingController _addressFieldTextEditingController;
   late TextEditingController _restaurantNameController;
   late TextEditingController _phoneController;
+  final _geolocationService = GeoLocationService();
 
   @override
   void initState() {
@@ -65,6 +68,43 @@ class _FooderAddRestaurantScreenState extends State<FooderAddRestaurantScreen> {
 
   }
 
+
+  void _showActionSheet(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    showAdaptiveActionSheet(
+      context: context,
+      title: Text('Select Action', style: textTheme.subtitle1,),
+      actions: <BottomSheetAction>[
+        BottomSheetAction(
+            leading: Container(
+              padding: const EdgeInsets.only(right: 10),
+              child: const Icon(Icons.location_searching, color: Colors.grey,),
+            ),
+            title: Text('Search Address', style: textTheme.subtitle1,),
+            onPressed: () {
+              Navigator.of(context).pushNamed('/restaurant-add-location');
+            }
+        ),
+        BottomSheetAction(
+            leading: Container(
+              padding: const EdgeInsets.only(right: 10),
+              child: const Icon(Icons.map, color: Colors.grey,),
+            ),
+            title: Text('Google Map', style: textTheme.subtitle1,),
+            onPressed: () async {
+              try {
+                await _geolocationService.determinePosition(context);
+                Navigator.of(context).pushNamed('/map-screen');
+              } catch(e) {
+                print(e);
+              }
+
+            }
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final appbarTheme = Theme.of(context).appBarTheme;
@@ -76,50 +116,55 @@ class _FooderAddRestaurantScreenState extends State<FooderAddRestaurantScreen> {
 
 
   Widget addRestaurantForm(BuildContext context) {
-      return Consumer<AuthModel>(
-        builder: (_, auth, __){
-          if(auth.user == null) {
-            Future(() =>
-                Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false)
-            );
-          }
-          return BlocConsumer<AddRestaurantBloc, AddRestaurantState>(
-            listener: (context, state) {
-              if(state.status == AddRestaurantFormStatus.failed) {
-                Navigator.of(context).pushNamed('/error');
+      return SingleChildScrollView(
+        child: GestureDetector(
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          child: Consumer<AuthModel>(
+            builder: (_, auth, __){
+              if(auth.user == null) {
+                Future(() =>
+                    Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false)
+                );
               }
-            },
-            builder: (context, state) {
-              if(state.status == AddRestaurantFormStatus.onLoad) {
-                return  const FooderLoadingWidget();
-              }
-              return Container(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: Form(
-                    key: _formkey,
-                    child:  Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children:  [
-                            getRestaurantName(),
-                            getAddressTextFormField(context),
-                            getCategoriesList(state.categories),
-                            getRestaurantPhoneNumber(),
-                            addRestaurantSubmitButton(),
-                            ElevatedButton(onPressed: () {
-                              context.read<AuthModel>().logoutUser();
-                            }, child: const Text('log out')),
-                          ],
+              return BlocConsumer<AddRestaurantBloc, AddRestaurantState>(
+                listener: (context, state) {
+                  if(state.status == AddRestaurantFormStatus.failed) {
+                    Navigator.of(context).pushNamed('/error');
+                  }
+                },
+                builder: (context, state) {
+                  if(state.status == AddRestaurantFormStatus.onLoad) {
+                    return  const FooderLoadingWidget();
+                  }
+                  return Container(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Form(
+                        key: _formkey,
+                        child:  Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children:  [
+                                getRestaurantName(),
+                                getAddressTextFormField(context),
+                                getCategoriesList(state.categories),
+                                getRestaurantPhoneNumber(),
+                                addRestaurantSubmitButton(),
+                                ElevatedButton(onPressed: () {
+                                  context.read<AuthModel>().logoutUser();
+                                }, child: const Text('log out')),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  )
+                      )
+                  );
+                },
               );
             },
-          );
-        },
+          ),
+        ),
       );
 
 
@@ -129,10 +174,6 @@ class _FooderAddRestaurantScreenState extends State<FooderAddRestaurantScreen> {
     return  FooderCustomTextFormField(
       labelName: 'Restaurant Name',
       textEditingController: _restaurantNameController,
-      // onChanged: (value) {
-      //   print('test');
-      //   _addRestaurantBloc.add(SetRestaurantName(value));
-      // },
       validator: (value) {
         if(value is String) {
           value = value.trim();
@@ -172,8 +213,7 @@ class _FooderAddRestaurantScreenState extends State<FooderAddRestaurantScreen> {
                 ),
                 child: InkWell(
                     onTap: () async {
-                      Navigator.of(context).pushNamed('/restaurant-add-location');
-
+                      _showActionSheet(context);
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,

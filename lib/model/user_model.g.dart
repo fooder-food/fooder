@@ -14,7 +14,6 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
       avatarType: json['avatarType'] as String,
       createDate: DateTime.parse(json['createDate'] as String),
       updateDate: DateTime.parse(json['updateDate'] as String),
-      deviceToken: json['deviceToken'] as String,
     );
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
@@ -25,5 +24,4 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'avatarType': instance.avatarType,
       'createDate': instance.createDate.toIso8601String(),
       'updateDate': instance.updateDate.toIso8601String(),
-      'deviceToken': instance.deviceToken,
     };

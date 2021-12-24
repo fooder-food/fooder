@@ -11,12 +11,12 @@ class AuthApiProvider {
   Future<Auth> register({
     required String email,
     required String password,
-    required String deviceToken
+    required String username,
   }) async {
     final data = {
       "email": email,
       "password": password,
-      "deviceToken": deviceToken,
+      "username": username,
     };
     final response = await _networkService.post('auth/user/register/email', data: data);
     print(response);
@@ -27,10 +27,12 @@ class AuthApiProvider {
   Future<Auth> login({
     required String email,
     required String password,
+    required String deviceToken,
   }) async {
     final data = {
       "email": email,
       "password": password,
+      "deviceToken": deviceToken,
     };
     final response = await _networkService.post('auth/login/email', data: data);
     final Auth auth = Auth.fromJson(response.data!["data"] as Map<String, dynamic>);
