@@ -93,15 +93,26 @@ class AddRestaurantBloc extends Bloc<AddRestaurantEvent, AddRestaurantState> {
   void _submitAddRestaurant(
       SubmitAddRestaurantForm event,
       Emitter<AddRestaurantState> emit
-      ) {
+      ) async {
+    emit(state.copyState(
+      status: AddRestaurantFormStatus.onAddRestaurant,
+    ));
     final String restaurantName = state.restaurantName;
     final String restaurantAddress = state.placeDetails!.address;
     final String phoneNumber = '${state.phonePrefix}${state.phoneNumber}';
+    print('category id ${state.selectedCategoyId}');
     final String selectedCategoryId = state.selectedCategoyId!;
+    final String placeId = state.placeDetails!.placeId;
+    await _addRestaurantRepo.addRestaurant(
+        restaurantName: restaurantName,
+        restaurantAddress: restaurantAddress,
+        placeId: placeId,
+        phoneNumber: phoneNumber,
+        selectedCategoryId: selectedCategoryId);
+   emit(state.copyState(
+     status: AddRestaurantFormStatus.addRestaurantSuccess,
+   ));
 
-    print('${state.restaurantName}');
-    print('${state.placeDetails!.placeId}');
-    print('${state.phonePrefix}${state.phoneNumber}');
   }
 
 }

@@ -2,6 +2,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_notification/bloc/home/home_bloc.dart';
 import 'package:flutter_notification/core/service/geo/geo_location.dart';
 import 'package:flutter_notification/model/providers/user_model.dart';
 import 'package:flutter_notification/ui/pages/home/widget/restaurant_card.dart';
@@ -10,6 +12,7 @@ import 'package:flutter_notification/ui/shared/widget/custom_button.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'delegate/presistent_delegate.dart';
 
 import 'dart:math' as math;
@@ -32,6 +35,9 @@ class FooderHomeScreen extends StatefulWidget {
 
 class _FooderHomeScreenState extends State<FooderHomeScreen> {
   late final ScrollController _scrollController;
+  RefreshController _refreshController = RefreshController(initialRefresh: false);
+
+  late HomeBloc homeBloc;
   final GeoLocationService _geoLocationService = GeoLocationService();
 
   bool _toTopButtonIsShow = false;
@@ -39,6 +45,8 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
 
   @override
   void initState() {
+    homeBloc = BlocProvider.of<HomeBloc>(context);
+    getRestaurant();
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollControllerListener);
     super.initState();
@@ -47,6 +55,14 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void getRestaurant() {
+    homeBloc.add(FetchAllRestaurant());
+  }
+
+  void _onRefresh() async{
+    getRestaurant();
   }
 
   void _scrollControllerListener() {
@@ -106,27 +122,40 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
   @override
   Widget build(BuildContext context) {
 
-    return SafeArea(
-      child: Stack(
-        children: [
-          CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              homeScreenNav(context),
-              homeSecondaryNav(context),
-              SliverToBoxAdapter(
-                child: homeFilterNav(context),
+    return Scaffold(
+      body: SafeArea(
+        child: Stack(
+          children: [
+            SmartRefresher(
+              controller: _refreshController,
+              enablePullDown: true,
+              enablePullUp: true,
+              child: CustomScrollView(
+                controller: _scrollController,
+                slivers: [
+                  homeScreenNav(context),
+                  homeSecondaryNav(context),
+                  SliverToBoxAdapter(
+                    child: homeFilterNav(context),
+                  ),
+                  restaurantList(),
+                ],
               ),
-              restaurantList(),
-            ],
-          ),
-          if(_toTopButtonIsShow)
-            Positioned(
-              right: 10,
-              bottom: 40,
-              child: scrollToTopButton(),
+              onRefresh: _onRefresh,
             ),
-        ],
+            if(_toTopButtonIsShow)
+              Positioned(
+                right: 10,
+                bottom: 40,
+                child: scrollToTopButton(),
+              ),
+          ],
+        ),
+
+        // RefreshIndicator(
+        //   onRefresh: () async {},
+        //   child:
+        // )
       ),
     );
   }
@@ -320,7 +349,9 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
         ),
         secondaryActionButton(
             icon:  Icons.map,
-            voidCallback: () {}
+            voidCallback: () {
+              Navigator.of(context).pushNamed('/map-screen');
+            }
         ),
       ],
     );
@@ -469,20 +500,32 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
         bottom: 15,
         right: 15,
       ),
-      sliver: SliverGrid(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 1,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          mainAxisExtent: 205,
-        ),
-        delegate: SliverChildBuilderDelegate(
-              (context, index) {
-            return const FooderRestaurantCard();
-          },
-          childCount: 4,
-        ),
+      sliver: BlocConsumer<HomeBloc, HomeState>(
+        listener: (context, state) {
+          if(state.status == HomeStatus.loadRestaurantDataSuccess) {
+            _refreshController.refreshCompleted();
+          }
+        },
+        builder: (context, state){
+          return SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 1,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              mainAxisExtent: 220,
+            ),
+            delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                return FooderRestaurantCard(
+                  state: state,
+                  index: index,
+                );
+              },
+              childCount: state.status == HomeStatus.loadRestaurantDataSuccess ? state.restaurants.length :  4,
+            ),
+          );
+        } ,
       ),
     );
   }
@@ -497,7 +540,7 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
             onTap: () {
               Navigator.of(context).pop();
             },
-            child: Icon(
+            child: const Icon(
               Icons.close,
               color: Colors.grey,
               size: 30,

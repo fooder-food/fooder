@@ -12,4 +12,17 @@ class AddRestaurantRepo {
 
   Future<List<RestaurantCategory>> fetchRestaurantCategories() async => _restaurantCategoriesApiProvider.fetchRestaurantCategory();
 
+  Future<Map<String, dynamic>?> addRestaurant({
+    required String restaurantName,
+    required String restaurantAddress,
+    required String placeId,
+    required String phoneNumber,
+    required String selectedCategoryId,
+  }) async => _restaurantCategoriesApiProvider.addRestaurant(
+      restaurantName: restaurantName,
+      restaurantAddress: restaurantAddress,
+      placeId: placeId,
+      phoneNumber: phoneNumber,
+      selectedCategoryId: selectedCategoryId
+  );
 }

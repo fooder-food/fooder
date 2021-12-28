@@ -4,7 +4,7 @@ import 'package:flutter_notification/bloc/restaurant-location/restaurant_locatio
 import 'package:flutter_notification/model/address_component_model.dart';
 import 'package:flutter_notification/model/country_model.dart';
 import 'package:flutter_notification/model/google_autocomplete_place_model.dart';
-import 'package:flutter_notification/model/google_map_location_model.dart';
+import 'package:flutter_notification/model/google_place_location_model.dart';
 
 part 'restaurant_location_event.dart';
 part 'restaurant_location_state.dart';
@@ -15,7 +15,6 @@ class RestaurantLocationBloc extends Bloc<RestaurantLocationEvent, RestaurantLoc
     on<GoogleSearchPlaces>(_googleSearchPlaces);
     // on<GetGooglePlaceDetails>(_getGooglePlaceDetails);
     on<SelectAddress>(_selectAddress);
-    on<SelectGoogleMapAddress>(_googleMapSelectAddress);
   }
 
   final RestaurantLocationRepo _restaurantLocationRepo = RestaurantLocationRepo();
@@ -61,25 +60,12 @@ class RestaurantLocationBloc extends Bloc<RestaurantLocationEvent, RestaurantLoc
       ) {
     try {
       emit(state.copyWith(status: getAddressStatus.onFindPlaceDetail));
+      final GooglePlaceLocation? geo = event.geo;
       AddressComponent selectedPlace = AddressComponent(placeId: event.placeId, address: event.address);
-      emit(state.copyWith(
-        status: getAddressStatus.findPlaceDetailSuccess,
-        selectedPlace: selectedPlace,
-      ));
-    } catch(e) {
-      emit(state.copyWith(status: getAddressStatus.failed));
-    }
-  }
-
-  void _googleMapSelectAddress(
-      SelectGoogleMapAddress event,
-      Emitter<RestaurantLocationState> emit
-      ) async {
-    try {
-      emit(state.copyWith(status: getAddressStatus.onFindPlaceDetail));
-      final GoogleMapLocation mapLocation = await _restaurantLocationRepo.fetchGoogleMapLocation(longitude: event.longitude, latitude: event.latitude);
-      print(mapLocation);
-      AddressComponent selectedPlace = AddressComponent(placeId: mapLocation.placeId, address: mapLocation.formattedAddress);
+      if(geo != null) {
+        print('test');
+        selectedPlace.geo = geo;
+      }
       emit(state.copyWith(
         status: getAddressStatus.findPlaceDetailSuccess,
         selectedPlace: selectedPlace,

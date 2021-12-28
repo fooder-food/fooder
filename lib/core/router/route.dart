@@ -12,6 +12,7 @@ import 'package:flutter_notification/ui/pages/restaurant/add_restaurant.dart';
 import 'package:flutter_notification/ui/pages/restaurant/add_restaurant_map_info.dart';
 import 'package:flutter_notification/ui/pages/restaurant/restaurant_locate.dart';
 import 'package:flutter_notification/ui/pages/restaurant/search_country.dart';
+import 'package:flutter_notification/ui/pages/restaurant/single_restaurant_info.dart';
 import 'package:flutter_notification/ui/pages/unknown/unknown.dart';
 
 class FooderRoute {
@@ -43,7 +44,8 @@ class FooderRoute {
     ),
     FooderUnknownScreen.routeName: (ctx) => FooderUnknownScreen(),
     FooderProfileScreen.routeName: (ctx) => const FooderProfileScreen(),
-    FooderEditProfileScreen.routeName: (ctx) => FooderEditProfileScreen(),
+    FooderEditProfileScreen.routeName: (ctx) => const FooderEditProfileScreen(),
+    FooderRestaurantInfoScreen.routeName: (ctx) => const FooderRestaurantInfoScreen(),
 
   };
 

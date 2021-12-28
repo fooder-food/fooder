@@ -1,5 +1,7 @@
-import 'package:flutter_notification/model/user_model.dart';
+
 import 'package:json_annotation/json_annotation.dart';
+
+import 'google_place_location_model.dart';
 
 part 'address_component_model.g.dart';
 
@@ -8,6 +10,7 @@ class AddressComponent {
   AddressComponent({
    required this.placeId,
    required this.address,
+    this.geo,
   });
 
   factory AddressComponent.fromJson(Map<String, dynamic> json) => _$AddressComponentFromJson(json);
@@ -15,4 +18,5 @@ class AddressComponent {
 
   final String placeId;
   final String address;
+  GooglePlaceLocation? geo;
 }

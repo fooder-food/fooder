@@ -13,6 +13,9 @@ enum AddRestaurantFormStatus {
   loadAllSuccess,
   onSelecteCategory,
   selectedCategory,
+  onAddRestaurant,
+  addRestaurantSuccess,
+  addRestaurantFailed,
   failed,
   success,
 }

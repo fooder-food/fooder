@@ -18,4 +18,22 @@ class RestaurantCategoriesApiProvider {
     }
   }
 
+  Future<Map<String, dynamic>?> addRestaurant({
+    required String restaurantName,
+    required String restaurantAddress,
+    required String placeId,
+    required String phoneNumber,
+    required String selectedCategoryId,
+  }) async {
+    final mapData = {
+      'restaurantName': restaurantName,
+      'restaurantAddress': restaurantAddress,
+      'placeId': placeId,
+      'phoneNumber': phoneNumber,
+      'selectedCategoryUniqueId': selectedCategoryId,
+    };
+   final response = await _networkService.post('restaurants/create', data: mapData);
+   return response.data;
+  }
+
 }

@@ -18,9 +18,12 @@ class GoogleSearchPlaces extends RestaurantLocationEvent {
 }
 
 class SelectAddress extends RestaurantLocationEvent {
-  const SelectAddress(this.placeId, this.address);
+  const SelectAddress(this.placeId, this.address, {
+    this.geo,
+  });
   final String placeId;
   final String address;
+  final GooglePlaceLocation? geo;
 }
 
 class GetGooglePlaceDetails extends RestaurantLocationEvent {

@@ -6,6 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_notification/bloc/add-restaurant/add_restaurant_bloc.dart';
 import 'package:flutter_notification/bloc/add-restaurant/add_restaurant_repo.dart';
 import 'package:flutter_notification/bloc/auth/auth_bloc.dart';
+import 'package:flutter_notification/bloc/home/home_bloc.dart';
 import 'package:flutter_notification/bloc/search-country/search_country_bloc.dart';
 import 'package:flutter_notification/bloc/search-country/search_country_repo.dart';
 import 'package:flutter_notification/model/providers/user_model.dart';
@@ -35,6 +36,7 @@ void main() async{
               create: (_) => SearchCountryBloc(searchCountryRepo: SearchCountryRepo()),
             ),
             BlocProvider<AuthBloc>(create: (_) => AuthBloc()),
+            BlocProvider<HomeBloc>(create: (_)=>HomeBloc(),),
           ],
           child: MultiProvider(
             providers: [

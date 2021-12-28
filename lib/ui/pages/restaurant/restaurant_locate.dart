@@ -21,6 +21,9 @@ class _FooderRestaurantLocateScreenState extends State<FooderRestaurantLocateScr
   void initState() {
     _restaurantLocationBloc = BlocProvider.of<RestaurantLocationBloc>(context);
     _searchAddressTextEditingController = TextEditingController();
+    if(_restaurantLocationBloc.state.selectedPlace != null && _restaurantLocationBloc.state.selectedPlace?.geo == null) {
+      _searchAddressTextEditingController.text = _restaurantLocationBloc.state.selectedPlace!.address;
+    }
     _searchAddressTextEditingController.addListener(_searchFieldListener);
     super.initState();
   }

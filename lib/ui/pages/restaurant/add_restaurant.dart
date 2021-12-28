@@ -1,10 +1,10 @@
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_notification/core/service/geo/geo_location.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_notification/bloc/add-restaurant/add_restaurant_bloc.dart';
 import 'package:flutter_notification/bloc/restaurant-location/restaurant_location_bloc.dart';
 import 'package:flutter_notification/model/providers/user_model.dart';
@@ -13,6 +13,7 @@ import 'package:flutter_notification/ui/shared/widget/custom_app_bar.dart';
 import 'package:flutter_notification/ui/shared/widget/custom_button.dart';
 import 'package:flutter_notification/ui/shared/widget/custom_text_form_field.dart';
 import 'package:flutter_notification/ui/shared/widget/loading.dart';
+import 'package:flutter_notification/ui/shared/widget/toast.dart';
 import 'package:provider/provider.dart';
 
 class FooderAddRestaurantScreen extends StatefulWidget {
@@ -82,7 +83,8 @@ class _FooderAddRestaurantScreenState extends State<FooderAddRestaurantScreen> {
             ),
             title: Text('Search Address', style: textTheme.subtitle1,),
             onPressed: () {
-              Navigator.of(context).pushNamed('/restaurant-add-location');
+              Navigator.of(context).pop();
+              Future(() =>  Navigator.of(context).pushNamed('/restaurant-add-location'));
             }
         ),
         BottomSheetAction(
@@ -94,7 +96,8 @@ class _FooderAddRestaurantScreenState extends State<FooderAddRestaurantScreen> {
             onPressed: () async {
               try {
                 await _geolocationService.determinePosition(context);
-                Navigator.of(context).pushNamed('/map-screen');
+                Navigator.of(context).pop();
+               Future(() => Navigator.of(context).pushNamed('/map-screen'));
               } catch(e) {
                 print(e);
               }
@@ -130,6 +133,13 @@ class _FooderAddRestaurantScreenState extends State<FooderAddRestaurantScreen> {
                 listener: (context, state) {
                   if(state.status == AddRestaurantFormStatus.failed) {
                     Navigator.of(context).pushNamed('/error');
+                  } else if (state.status == AddRestaurantFormStatus.addRestaurantSuccess) {
+                    showToast(
+                        msg: 'add Restaurant successful',
+                        context: context,
+                        backgroundColor: Colors.green
+                    );
+                    Navigator.of(context).pop();
                   }
                 },
                 builder: (context, state) {
@@ -191,6 +201,7 @@ class _FooderAddRestaurantScreenState extends State<FooderAddRestaurantScreen> {
         if(state.status == getAddressStatus.findPlaceDetailSuccess) {
           _changeSearchAddressValue();
         }
+        print(state.selectedPlace?.placeId);
         return FooderCustomTextFormField(
           labelName: 'Restaurant Address',
           textEditingController: _addressFieldTextEditingController,
@@ -266,9 +277,6 @@ class _FooderAddRestaurantScreenState extends State<FooderAddRestaurantScreen> {
   }
 
   Widget categoryCard(RestaurantCategory category) {
-    final Widget svgIcon = SvgPicture.network(
-      category.categoryIcon,
-    );
     return  GestureDetector(
       onTap: () {
         _addRestaurantBloc.add(SetSelectedCategoryEvent(category.uniqueId));
@@ -304,7 +312,11 @@ class _FooderAddRestaurantScreenState extends State<FooderAddRestaurantScreen> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(10),
-                        child: svgIcon,
+                        child: CachedNetworkImage(
+                          imageUrl: category.categoryIcon,
+                          placeholder: (context, url) => CircularProgressIndicator(),
+                          errorWidget: (context, url, error) => Icon(Icons.error),
+                        ),
                       ),
                       isSelected ?
                       const Align(
