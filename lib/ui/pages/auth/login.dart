@@ -40,7 +40,7 @@ class _FooderLoginSelectScreenState extends State<FooderLoginSelectScreen> {
             bottom: 15,
             child: TextButton(
               onPressed: () {
-                Navigator.of(context).pushNamed('/');
+                Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
               },
               child: Text(
                 "SKIP",

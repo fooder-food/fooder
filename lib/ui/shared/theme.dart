@@ -13,6 +13,7 @@ class FooderAppTheme {
   // light mode
   static final ThemeData lightTheme = ThemeData(
     primaryColor: const Color.fromRGBO(255, 114, 94,1),
+    secondaryHeaderColor: Colors.grey[600],
     canvasColor: Colors.white,
     appBarTheme: const AppBarTheme(
         backgroundColor: Colors.white,

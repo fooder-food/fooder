@@ -82,7 +82,7 @@ class _FooderRestaurantCardState extends State<FooderRestaurantCard> {
                             ],
                           )
                         ),
-                        Text('4.7', style: textTheme.headline2,),
+                        Text(widget.state.restaurants[widget.index].rating.toString(), style: textTheme.headline2,),
                       ],
                     ),
                     const SizedBox(
