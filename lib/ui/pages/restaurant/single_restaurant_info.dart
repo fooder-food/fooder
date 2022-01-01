@@ -440,7 +440,7 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
                           height: 5,
                         ),
                         Text(
-                          "Edit",
+                          "Add Review",
                           style: Theme.of(context).textTheme.subtitle2!.copyWith(
                             fontWeight: FontWeight.normal,
                             fontSize: 14,
@@ -814,7 +814,7 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
     return Column(
       children: [
         Text(
-          'Comments ($total)',
+          'Review ($total)',
           style: textTheme.headline2!.copyWith(
             color: Theme.of(context).primaryColor
           ),

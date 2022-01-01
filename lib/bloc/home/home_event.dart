@@ -6,4 +6,13 @@ abstract class HomeEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class FetchAllRestaurant extends HomeEvent {}
+class FetchAllRestaurant extends HomeEvent {
+  const FetchAllRestaurant({
+    this.radius,
+    this.longitude,
+    this.latitude,
+});
+  final double? radius;
+  final double? latitude;
+  final double? longitude;
+}

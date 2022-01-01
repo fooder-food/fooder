@@ -11,6 +11,7 @@ import 'package:flutter_notification/bloc/restaurant-details/restaurant_details_
 import 'package:flutter_notification/bloc/search-country/search_country_bloc.dart';
 import 'package:flutter_notification/bloc/search-country/search_country_repo.dart';
 import 'package:flutter_notification/model/providers/user_model.dart';
+import 'package:flutter_notification/model/providers/user_search_radius.dart';
 import 'package:flutter_notification/ui/pages/app.dart';
 import 'package:provider/provider.dart';
 
@@ -43,6 +44,7 @@ void main() async{
           child: MultiProvider(
             providers: [
               ChangeNotifierProvider(create: (_) => AuthModel()),
+              ChangeNotifierProvider(create: (_) => UserSearchRadiusModel()),
             ],
             child: const MyApp(),
           )

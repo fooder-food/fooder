@@ -8,9 +8,30 @@ import 'package:image_picker/image_picker.dart';
 class HomeApiProvider {
   final NetworkService _networkService = NetworkService();
 
-  Future<List<Restaurant>> fetchRestaurant() async{
+  Future<List<Restaurant>> fetchRestaurant({
+    double? longitude,
+    double? latitude,
+    double? radius,
+  }) async{
+
+    bool isSearchByGeo = false;
+    Map<String, dynamic>? geoQueryData;
+    String url ='restaurants/all';
+    if(latitude != null && longitude != null && radius != null) {
+      print(radius);
+      isSearchByGeo = true;
+      geoQueryData = {
+        "radius": radius,
+        "latitude": latitude,
+        "longitude": longitude,
+      };
+
+     // url = url + '?radius=${radius}&longitude=${longitude}&latitude=${latitude}';
+      url = url + '?radius=${radius}&longitude=103.6715&latitude=1.5177';
+    }
+
    try {
-     final response = await _networkService.get('restaurants/all',);
+     final response = await _networkService.get(url,);
      final data = response.data["data"];
      final List<Restaurant> restaurants = List.from(
        data.map((restaurant) => Restaurant.fromJson(restaurant)),

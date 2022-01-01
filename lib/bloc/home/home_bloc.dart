@@ -23,7 +23,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(state.copyWith(
         status: HomeStatus.onLoadRestaurantData,
       ));
-       final List<Restaurant> restaurants = await _homeRepo.fetchRestaurant();
+       final List<Restaurant> restaurants = await _homeRepo.fetchRestaurant(
+         latitude: event.latitude,
+         longitude: event.longitude,
+         radius: event.radius,
+       );
+       print(restaurants);
       // print(restaurants);
 
       emit(state.copyWith(

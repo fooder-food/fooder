@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_notification/bloc/home/home_bloc.dart';
 import 'package:flutter_notification/core/service/geo/geo_location.dart';
 import 'package:flutter_notification/model/providers/user_model.dart';
+import 'package:flutter_notification/model/providers/user_search_radius.dart';
 import 'package:flutter_notification/ui/pages/home/widget/restaurant_card.dart';
 import 'package:flutter_notification/ui/shared/widget/avatar.dart';
 import 'package:flutter_notification/ui/shared/widget/custom_button.dart';
@@ -13,7 +16,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:syncfusion_flutter_sliders/sliders.dart';
 import 'delegate/presistent_delegate.dart';
+import 'package:syncfusion_flutter_core/theme.dart';
 
 import 'dart:math' as math;
 
@@ -39,9 +44,8 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
 
   late HomeBloc homeBloc;
   final GeoLocationService _geoLocationService = GeoLocationService();
-
+  bool hasLocation = false;
   bool _toTopButtonIsShow = false;
-  List<String> test = ["nearby", "nearby", "nearby", "nearby","nearby", "nearby", "nearby", "nearby"];
 
   @override
   void initState() {
@@ -49,6 +53,12 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
     getRestaurant();
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollControllerListener);
+
+    // if(_geoLocationService.getPermissionIsAlways && _geoLocationService.getServiceEnabled) {
+    //   setState(() {
+    //     hasLocation = true;
+    //   });
+    // }
     super.initState();
   }
   @override
@@ -58,10 +68,15 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
   }
 
   void getRestaurant() {
-    homeBloc.add(FetchAllRestaurant());
+    homeBloc.add(const FetchAllRestaurant());
   }
 
   void _onRefresh() async{
+    // if(_geoLocationService.getServiceEnabled && _geoLocationService.getPermissionIsAlways) {
+    //   setState(() {
+    //     hasLocation = false;
+    //   });
+    // }
     getRestaurant();
   }
 
@@ -94,22 +109,43 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
 
   }
 
-  void _getLocation() async {
-    Position positon = await _geoLocationService.determinePosition(context);
-    print(positon.latitude);
-    print(positon.longitude);
-    if(positon != null) {
-      Navigator.of(context).pop();
-    }
+  void reFetchRestaurant({required double distance, required double longitude, required double latitude}) {
+    homeBloc.add(FetchAllRestaurant(
+      radius: distance,
+      longitude: longitude,
+      latitude: latitude,
+    ));
   }
 
-  void _getNearMeModalBottomSheet() async {
+  void _getLocation() async {
+    Position positon = await _geoLocationService.determinePosition(context);
+    if(_geoLocationService.getServiceEnabled && _geoLocationService.getPermissionIsAlways) {
+      final UserSearchRadiusModel radiusModel = context.read<UserSearchRadiusModel>();
+      reFetchRestaurant(
+          distance: radiusModel.distance,
+          longitude: positon.longitude,
+          latitude: positon.latitude
+      );
+      setState(() {
+        hasLocation = true;
+      });
+    }
 
-    if(_geoLocationService.serviceEnabled && _geoLocationService.getPermissionIsAlways) {
-      final position = await _geoLocationService.determinePostionWithOutCheck();
-      print(position);
+  }
+
+
+  void _getNearMeModalBottomSheet() async {
+    await _geoLocationService.init();
+    if(_geoLocationService.getServiceEnabled && _geoLocationService.getPermissionIsAlways) {
+      // final position = await _geoLocationService.determinePostionWithOutCheck();
+        showMaterialModalBottomSheet(
+          context: context,
+          enableDrag: false,
+          builder: (context) => selectAreaRadius(),
+        );
       return;
     }
+
     showMaterialModalBottomSheet(
       context: context,
       builder: (context) => SingleChildScrollView(
@@ -392,10 +428,16 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
           homeFilterSorting(context),
           Row(
             children: [
-              filterButton(context,
-                icon: Icons.refresh_rounded,
-                buttonTitle: 'Near Me',
-                voidCallback: _getNearMeModalBottomSheet,
+              Consumer<UserSearchRadiusModel>(
+                builder: (context, radiusModel,_) {
+                  return filterButton(context,
+                  icon: Icons.refresh_rounded,
+                  buttonTitle: hasLocation
+                    ? radiusModel.distanceText
+                    : 'Near Me',
+                  voidCallback: _getNearMeModalBottomSheet,
+                  );
+                }
               ),
               const SizedBox(
                 width: 10,
@@ -501,12 +543,73 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
         right: 15,
       ),
       sliver: BlocConsumer<HomeBloc, HomeState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if(state.status == HomeStatus.loadRestaurantDataSuccess) {
+
+            await _geoLocationService.init();
+            if(!_geoLocationService.getPermissionIsAlways || !_geoLocationService.getServiceEnabled) {
+              setState(() {
+                hasLocation = false;
+              });
+            } else  if(_geoLocationService.getPermissionIsAlways && _geoLocationService.getServiceEnabled){
+              setState(() {
+                hasLocation = true;
+              });
+            }
             _refreshController.refreshCompleted();
           }
         },
         builder: (context, state){
+          if(state.status == HomeStatus.loadFailed) {
+            return SliverToBoxAdapter(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text('Server Error'),
+                    IconButton(
+                        onPressed: () async {
+                          await _refreshController.requestRefresh();
+                          _onRefresh();
+                          if(state.status == HomeStatus.loadFailed) {
+                            _refreshController.refreshFailed();
+                          }
+
+                        },
+                        icon: const Icon(Icons.refresh_rounded),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          if(state.restaurants.isEmpty) {
+            return SliverToBoxAdapter(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text('No Data'),
+                    IconButton(
+                      onPressed: () async {
+                        await _refreshController.requestRefresh();
+                        _onRefresh();
+                        if(state.status == HomeStatus.loadFailed) {
+                          _refreshController.refreshFailed();
+                        }
+
+                      },
+                      icon: const Icon(Icons.refresh_rounded),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
           return SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
@@ -578,6 +681,97 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
             )
         ),
       ] ,
+    );
+  }
+
+  Widget selectAreaRadius() {
+    return SizedBox(
+      height: 200,
+      child:  StatefulBuilder(
+        builder: (context, setState) {
+          final primaryColor = Theme.of(context).primaryColor;
+          final textTheme = Theme.of(context).textTheme;
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20,horizontal: 30),
+            child: Consumer<UserSearchRadiusModel>(
+              builder: (context, radiusModel, _) {
+                return Column(
+                  children: [
+                    Column(
+                      children: [
+                        Text(
+                          'Select Your want search radius',
+                          style: textTheme.subtitle2!.copyWith(
+                            fontWeight: FontWeight.w400,
+                            color: Theme.of(context).secondaryHeaderColor,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          child: Text(
+                            radiusModel.distanceText,
+                            style: textTheme.headline2!.copyWith(
+                              fontSize: 30,
+                              color: primaryColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SfSliderTheme(
+                          data: SfSliderThemeData(
+                            activeTrackHeight: 3,
+                            inactiveTrackHeight: 3,
+                            activeTrackColor: primaryColor.withOpacity(0.5),
+                            inactiveTrackColor: primaryColor.withOpacity(0.5),
+                            activeDividerRadius: 5,
+                            inactiveDividerRadius: 5,
+                            inactiveDividerColor: primaryColor,
+                            activeDividerColor: primaryColor,
+                            thumbRadius: 10,
+                            thumbColor: primaryColor,
+
+                          ),
+                          child: SfSlider(
+                            min: 0.0,
+                            max: 4.0,
+                            value: radiusModel.radius,
+                            showDividers: true,
+                            interval: 1,
+                            onChanged: (value) => radiusModel.updateRadius(value),
+                            onChangeEnd: (value) async {
+                              Navigator.of(context).pop();
+                              final Position position = await _geoLocationService.determinePosition(context);
+                              homeBloc.add(FetchAllRestaurant(
+                                radius: radiusModel.distance,
+                                longitude: position.longitude,
+                                latitude: position.latitude,
+                              ));
+                              await Future.delayed(const Duration(milliseconds: 500));
+                              radiusModel.updateRadiusWhenChangeEnd();
+
+                            },
+                          ),
+                        ),
+                        Text(
+                          'My Near',
+                          style: textTheme.subtitle2!.copyWith(
+                            color: Theme.of(context).secondaryHeaderColor,
+                            fontWeight: FontWeight.normal,
+                          )
+                          ,),
+                      ],
+                    ),
+                  ],
+                );
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 

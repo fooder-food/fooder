@@ -28,11 +28,16 @@ class GeoLocationService {
     }
 
     if (!serviceEnabled) {
-      Geolocator.getCurrentPosition();
-      return Future.error('Location services are disabled.');
+      await Geolocator.getCurrentPosition();
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      Navigator.of(context).pop();
+      print(serviceEnabled);
+      if(!serviceEnabled) {
+        return Future.error('Location services are disabled.');
+      }
     }
 
-    return await Geolocator.getCurrentPosition();
+    return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
   }
 
   Future<Position> determinePostionWithOutCheck() async {

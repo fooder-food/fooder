@@ -13,5 +13,13 @@ class HomeRepo {
   static final HomeRepo _instance = HomeRepo._constructor();
   final HomeApiProvider _homeApiProvider = HomeApiProvider();
 
-  Future<List<Restaurant>> fetchRestaurant() async => _homeApiProvider.fetchRestaurant();
+  Future<List<Restaurant>> fetchRestaurant({
+    double? longitude,
+    double? latitude,
+    double? radius,
+  }) async => _homeApiProvider.fetchRestaurant(
+    longitude: longitude,
+    latitude: latitude,
+    radius: radius,
+  );
 }

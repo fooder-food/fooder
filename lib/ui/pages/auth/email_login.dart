@@ -4,6 +4,7 @@ import 'package:flutter_notification/bloc/auth/auth_bloc.dart';
 import 'package:flutter_notification/ui/shared/widget/custom_app_bar.dart';
 import 'package:flutter_notification/ui/shared/widget/custom_button.dart';
 import 'package:flutter_notification/ui/shared/widget/custom_text_form_field.dart';
+import 'package:flutter_notification/ui/shared/widget/toast.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 class FooderEmailLoginScreen extends StatefulWidget {
   static String routeName = '/email-login';
@@ -48,14 +49,11 @@ class _FooderEmailLoginScreenState extends State<FooderEmailLoginScreen> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) async {
-          if(state is AuthenticatedState) {ScaffoldMessenger.of(context).showSnackBar(
-               SnackBar(
-                 duration: const Duration(milliseconds: 500),
-                content: Text(state.auth.message),
-                backgroundColor: Colors.green,
-              ),
+          if(state is AuthenticatedState) {
+            showToast(
+                context: context,
+                msg: 'Login Successful'
             );
-            await Future.delayed(const Duration(milliseconds: 1000));
             Navigator.of(context).pushNamed('/');
           } else if (state is UnAuthenticatedState) {
             ScaffoldMessenger.of(context).showSnackBar(
