@@ -6,7 +6,7 @@ import '../user_model.dart';
 
 class UserSearchRadiusModel extends ChangeNotifier {
   double _radius = 0.0;
-  double _distance = 0.0;
+  double _distance = 100;
   String _distanceText = '100m';
 
   double get radius => _radius;

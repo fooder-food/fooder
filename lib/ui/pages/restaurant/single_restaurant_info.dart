@@ -38,6 +38,7 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
   late final CameraPosition _initialPosition;
   late final RestaurantDetailsBloc _restaurantDetailsBloc;
   late final AuthModel auth;
+  String restaurantUniqueId = '';
   @override
   void initState() {
     super.initState();
@@ -61,6 +62,8 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
   void initRestaurantInfo() {
     final arg = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final uniqueId = arg["uniqueId"];
+    restaurantUniqueId = arg["uniqueId"];
+    print('unique is $restaurantUniqueId');
     _restaurantDetailsBloc.add(FetchRestaurantInfo(uniqueId,
       userUniqueId: auth.user?.user?.uniqueId,
     ));
@@ -93,8 +96,16 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
     ));
   }
 
-  void _writeComment() {
+  void _writeComment() async {
     _ifIsGuest();
+    print('unique comment is $restaurantUniqueId');
+    await Navigator.of(context).pushNamed('/review',arguments: {
+    'uniqueId': restaurantUniqueId ,
+    });
+    _restaurantDetailsBloc.add(FetchRestaurantInfo(restaurantUniqueId,
+      userUniqueId: auth.user?.user?.uniqueId,
+    ));
+
   }
 
   void _addList() {

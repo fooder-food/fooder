@@ -50,7 +50,7 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
   @override
   void initState() {
     homeBloc = BlocProvider.of<HomeBloc>(context);
-    getRestaurant();
+    homeInit();
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollControllerListener);
 
@@ -67,17 +67,42 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
     super.dispose();
   }
 
+  void homeInit() async {
+    await initRestaurant();
+    getRestaurant();
+  }
+
+  Future<void> initRestaurant() async {
+    try {
+      final position = await _geoLocationService.determinePosition(context);
+      if(_geoLocationService.getServiceEnabled && _geoLocationService.getPermissionIsAlways) {
+        final userSearchModel = context.read<UserSearchRadiusModel>();
+        homeBloc.add(FetchAllRestaurant(
+          radius: userSearchModel.distance,
+          latitude: position.latitude,
+          longitude: position.longitude,
+        ));
+        return;
+      }
+    } catch(e) {
+      if(!_geoLocationService.getServiceEnabled || !_geoLocationService.getPermissionIsAlways) {
+        setState(() {
+          hasLocation = false;
+        });
+      }
+      print(e);
+    }
+    getRestaurant();
+  }
+
   void getRestaurant() {
     homeBloc.add(const FetchAllRestaurant());
   }
 
-  void _onRefresh() async{
-    // if(_geoLocationService.getServiceEnabled && _geoLocationService.getPermissionIsAlways) {
-    //   setState(() {
-    //     hasLocation = false;
-    //   });
-    // }
-    getRestaurant();
+  Future<void> _onRefresh() async{
+      await initRestaurant();
+      getRestaurant();
+      _refreshController.refreshCompleted();
   }
 
   void _scrollControllerListener() {
@@ -571,7 +596,7 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
                     IconButton(
                         onPressed: () async {
                           await _refreshController.requestRefresh();
-                          _onRefresh();
+                          await _onRefresh();
                           if(state.status == HomeStatus.loadFailed) {
                             _refreshController.refreshFailed();
                           }
@@ -596,7 +621,7 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
                     IconButton(
                       onPressed: () async {
                         await _refreshController.requestRefresh();
-                        _onRefresh();
+                        await _onRefresh();
                         if(state.status == HomeStatus.loadFailed) {
                           _refreshController.refreshFailed();
                         }

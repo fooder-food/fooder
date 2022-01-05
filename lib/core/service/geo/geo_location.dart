@@ -16,7 +16,7 @@ class GeoLocationService {
     permission = await Geolocator.checkPermission();
   }
 
-  Future<Position> determinePosition(BuildContext context) async {
+  Future<Position> determinePosition(BuildContext context,) async {
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {

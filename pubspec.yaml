@@ -71,7 +71,9 @@ dependencies:
   url_launcher: ^6.0.17
   syncfusion_flutter_sliders: ^19.4.40
   syncfusion_flutter_core: ^19.4.40
-
+  photo_manager: ^1.3.10
+  path_provider: ^2.0.8
+  gallery_saver: ^2.3.2
 
 dev_dependencies:
   flutter_test:
