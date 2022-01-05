@@ -10,6 +10,7 @@ import 'package:flutter_notification/ui/pages/restaurant/widget/restaurant_comme
 import 'package:flutter_notification/ui/shared/widget/custom_app_bar.dart';
 import 'package:flutter_notification/ui/shared/widget/loading.dart';
 import 'package:flutter_notification/ui/shared/widget/toast.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -824,15 +825,42 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
     final int total = state.restaurant!.good + state.restaurant!.normal + state.restaurant!.bad;
     return Column(
       children: [
-        Text(
-          'Review ($total)',
-          style: textTheme.headline2!.copyWith(
-            color: Theme.of(context).primaryColor
+        RichText(
+          text: TextSpan(
+            text: 'Review ',
+            style: textTheme.headline2!.copyWith(
+                color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.w400
+            ),
+            children: [
+              TextSpan(text: '(',
+                style: textTheme.headline2!.copyWith(
+                  color: Theme.of(context).primaryColor,
+                  fontWeight: FontWeight.w800,
+              ),),
+              TextSpan(text: total.toString(),
+                style: textTheme.headline2!.copyWith(
+                  color: Theme.of(context).primaryColor,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              TextSpan(text: ')',
+                style: textTheme.headline2!.copyWith(
+                  color: Theme.of(context).primaryColor,
+                  fontWeight: FontWeight.w800,
+              ),),
+            ],
           ),
         ),
+        // Text(
+        //   'Review ($total)',
+        //   style: textTheme.headline2!.copyWith(
+        //     color: Theme.of(context).primaryColor
+        //   ),
+        // ),
         commentType(state),
         const Divider(),
-        FooderCommentCard(comments: state.restaurant!.comments,)
+        FooderCommentCard(comments: state.restaurant!.comments, restaurantName: state.restaurant!.restaurantName,)
       ],
     );
   }
@@ -856,15 +884,16 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.mood,
-                          size: 40,
-                          color: Theme.of(context).primaryColor,
+                        SvgPicture.asset(
+                        'assets/img/delicious.svg',
+                        ),
+                        const SizedBox(
+                          height: 5,
                         ),
                         Text(
                           'Delicious! (${state.restaurant!.good})',
                           style: textTheme.subtitle2!.copyWith(
-                            fontWeight: FontWeight.normal,
+                            fontWeight: FontWeight.w500,
                             fontSize: 14,
                             color: Theme.of(context).primaryColor,
                           ) ,
@@ -883,15 +912,16 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.sentiment_dissatisfied,
-                          size: 40,
-                          color: Theme.of(context).primaryColor,
+                        SvgPicture.asset(
+                          'assets/img/notBad.svg',
+                        ),
+                        const SizedBox(
+                          height: 5,
                         ),
                         Text(
                           'Not Bad (${state.restaurant!.normal})',
                           style: textTheme.subtitle2!.copyWith(
-                            fontWeight: FontWeight.normal,
+                            fontWeight: FontWeight.w500,
                             fontSize: 14,
                             color: Theme.of(context).primaryColor,
                           ) ,
@@ -910,15 +940,16 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.sentiment_dissatisfied_rounded,
-                          size: 40,
-                          color: Theme.of(context).primaryColor,
+                        SvgPicture.asset(
+                          'assets/img/normal.svg',
+                        ),
+                        const SizedBox(
+                          height: 5,
                         ),
                         Text(
                           'Normal (${state.restaurant!.bad})',
                           style: textTheme.subtitle2!.copyWith(
-                              fontWeight: FontWeight.normal,
+                              fontWeight: FontWeight.w500,
                               fontSize: 14,
                               color: Theme.of(context).primaryColor,
                               overflow: TextOverflow.ellipsis

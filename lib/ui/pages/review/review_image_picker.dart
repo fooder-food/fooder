@@ -21,6 +21,7 @@ class FooderReviewImagePicker extends StatefulWidget {
 class _FooderReviewImagePickerState extends State<FooderReviewImagePicker> {
   List<AssetPathEntity> _albums = [];
   List<AssetEntity> _selectedMedia = [];
+  List<AssetEntity> _confirmSelectedMedia = [];
   List<AssetEntity> _media = [];
   final ImagePicker _picker = ImagePicker();
   @override
@@ -28,24 +29,41 @@ class _FooderReviewImagePickerState extends State<FooderReviewImagePicker> {
     // TODO: implement initState
     WidgetsBinding.instance!.addPostFrameCallback((_) async{
      await _fetchMedia();
+
     });
+    Future.delayed(Duration.zero,initSelectedPhoto);
     super.initState();
+  }
+
+  void initSelectedPhoto() {
+    final arg = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final selectedMedia = arg["selectedMedia"];
+    if(selectedMedia.isNotEmpty) {
+      setState(() {
+        _selectedMedia = List.from(selectedMedia);
+        _confirmSelectedMedia = List.from(selectedMedia);
+      });
+    }
+
   }
 
   _fetchMedia() async {
     var result = await PhotoManager.requestPermissionExtend();
+
     if (result.isAuth) {
       List<AssetPathEntity> albums =
       await PhotoManager.getAssetPathList();
-      List<AssetEntity> media = await albums[0].getAssetListPaged(0, 20);
-      setState(() {
-        _albums = albums;
-        _media = media;
-      });
-
+      if(albums.isNotEmpty) {
+        List<AssetEntity> media = await albums[0].getAssetListPaged(0, 20);
+        setState(() {
+          _albums = albums;
+          _media = media;
+        });
+      }
       // success
     } else {
       // fail
+      PhotoManager.openSetting();
       /// if result is fail, you can call `PhotoManager.openSetting();`  to open android/ios applicaton's setting to get permission
     }
   }
@@ -58,6 +76,10 @@ class _FooderReviewImagePickerState extends State<FooderReviewImagePicker> {
       appBar: screenAppBar(
         appbarTheme,
         appTitle: 'new Review',
+        onPopCallback: () {
+          print(_confirmSelectedMedia);
+          Navigator.of(context).pop(_confirmSelectedMedia);
+        },
         actions: [
           IconButton(
               onPressed: () async {
@@ -99,7 +121,10 @@ class _FooderReviewImagePickerState extends State<FooderReviewImagePicker> {
           ),
           IconButton(
               onPressed: () async {
-                Navigator.of(context).pop(_selectedMedia);
+                setState(() {
+                  _confirmSelectedMedia = List.from(_selectedMedia);
+                });
+                Navigator.of(context).pop(_confirmSelectedMedia);
               },
               icon: Icon(
                 Icons.check_rounded,

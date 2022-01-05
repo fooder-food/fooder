@@ -13,8 +13,10 @@ RestaurantComment _$RestaurantCommentFromJson(Map<String, dynamic> json) =>
       type: json['type'] as String,
       content: json['content'] as String,
       uniqueId: json['uniqueId'] as String,
-      photos:
-          (json['photos'] as List<dynamic>).map((e) => e as String).toList(),
+      photos: (json['photos'] as List<dynamic>)
+          .map(
+              (e) => RestaurantCommentPhoto.fromJson(e as Map<String, dynamic>))
+          .toList(),
       user: CommentUser.fromJson(json['user'] as Map<String, dynamic>),
       likeTotal: json['likeTotal'] as int,
       replyTotal: json['replyTotal'] as int,

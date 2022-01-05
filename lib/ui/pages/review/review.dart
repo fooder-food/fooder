@@ -1,9 +1,11 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_notification/bloc/comments/comments_repo.dart';
 import 'package:flutter_notification/ui/shared/widget/custom_app_bar.dart';
 import 'package:flutter_notification/ui/shared/widget/custom_text_form_field.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class FooderRestaurantReviewScreen extends StatefulWidget {
@@ -26,17 +28,17 @@ class _FooderRestaurantReviewScreenState extends State<FooderRestaurantReviewScr
   final List<Map<String, dynamic>> _selectionTypeList = [
     {
       "id": 0,
-      "icon":  Icons.mood,
+      "icon":  'assets/img/delicious.svg',
       "text":  'Delicious!',
     },
     {
       "id": 1,
-      "icon":  Icons.sentiment_dissatisfied,
+      "icon":  'assets/img/notBad.svg',
       "text": 'Not Bad',
     },
     {
       "id": 2,
-      "icon":  Icons.sentiment_dissatisfied_rounded,
+      "icon":  'assets/img/normal.svg',
       "text": 'Normal',
     },
   ];
@@ -52,6 +54,7 @@ class _FooderRestaurantReviewScreenState extends State<FooderRestaurantReviewScr
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     final appbarTheme = Theme.of(context).appBarTheme;
@@ -63,14 +66,25 @@ class _FooderRestaurantReviewScreenState extends State<FooderRestaurantReviewScr
         actions: [
           IconButton(
               onPressed: () async {
+                List<File> photos = [];
                 print(restaurantUniqueId);
                 if(onSubmit) {
                   return;
                 }
+                if(_selectedMedia.isNotEmpty) {
+                  for (var media in _selectedMedia) {
+                    final file = await media.file;
+                    photos.add(file!);
+                  }
+                }
+                print(photos);
                 await _commentsRepo.addReview(
                     content: _contentTextEditingController.text,
                     type: _selectionType,
-                    restaurantUniqueId: restaurantUniqueId);
+                    restaurantUniqueId: restaurantUniqueId,
+                    photos: photos.isEmpty ? null : photos,
+                );
+
                 setState(() {
                   onSubmit = true;
                 });
@@ -78,7 +92,7 @@ class _FooderRestaurantReviewScreenState extends State<FooderRestaurantReviewScr
                 setState(() {
                   onSubmit = false;
                 });
-                Navigator.of(context).pop();
+               // Navigator.of(context).pop();
               },
               icon: Icon(
                 Icons.check_rounded,
@@ -162,28 +176,35 @@ class _FooderRestaurantReviewScreenState extends State<FooderRestaurantReviewScr
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(10),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(
-                          item["icon"],
-                          size: 40,
-                          color: _selectionType == item["id"]
-                              ? Theme.of(context).primaryColor
-                              : Colors.grey[400],
-                        ),
-                        Text(
-                          item["text"],
-                          style: textTheme.subtitle2!.copyWith(
-                            fontWeight: FontWeight.normal,
-                            fontSize: 14,
-                            color:  _selectionType == item["id"]
-                                ? Theme.of(context).primaryColor
-                                : Colors.grey[400],
-                          ) ,
-                        )
-                      ],
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(
+                            item["icon"],
+                          ),
+                          // Icon(
+                          //   item["icon"],
+                          //   size: 40,
+                          //   color: _selectionType == item["id"]
+                          //       ? Theme.of(context).primaryColor
+                          //       : Colors.grey[400],
+                          // ),
+                          Text(
+                            item["text"],
+                            style: textTheme.subtitle2!.copyWith(
+                              fontWeight:  _selectionType == item["id"]
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              fontSize: 14,
+                              color:  _selectionType == item["id"]
+                                  ? Theme.of(context).primaryColor
+                                  : Colors.grey[400],
+                            ) ,
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -233,9 +254,12 @@ class _FooderRestaurantReviewScreenState extends State<FooderRestaurantReviewScr
                  "selectedMedia": _selectedMedia,
                }
                );
-               setState(() {
-                 _selectedMedia = result as List<AssetEntity>;
-               });
+               if(result != null) {
+                 setState(() {
+                   _selectedMedia = result as List<AssetEntity>;
+                 });
+               }
+
               },
               child: Container(
                 padding: const EdgeInsets.all(5),

@@ -2,8 +2,11 @@ import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_notification/model/comment_user_model.dart';
 import 'package:flutter_notification/model/providers/user_model.dart';
 import 'package:flutter_notification/model/restaurant_comment_model.dart';
+import 'package:flutter_notification/model/restaurant_comment_photo_model.dart';
+import 'package:flutter_notification/ui/pages/restaurant/widget/restaurant_photo_wrapper.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -12,8 +15,10 @@ class FooderCommentCard extends StatefulWidget {
   FooderCommentCard({
     Key? key,
     required this.comments,
+    required this.restaurantName,
   }) : super(key: key);
   List<RestaurantComment> comments;
+  String restaurantName;
   @override
   _FooderCommentCardState createState() => _FooderCommentCardState();
 }
@@ -31,13 +36,13 @@ class _FooderCommentCardState extends State<FooderCommentCard> {
     super.initState();
   }
 
-  IconData commentTypeIcon(String type) {
+  String commentTypeIcon(String type) {
     if(type.toUpperCase() == 'GOOD') {
-      return Icons.mood;
+      return "assets/img/delicious.svg";
     } else if (type.toUpperCase() == 'NORMAL') {
-      return Icons.sentiment_dissatisfied;
+      return "assets/img/notBad.svg";
     }
-    return Icons.sentiment_dissatisfied_rounded;
+    return"assets/img/normal.svg";
   }
 
   String commentTypeTitle(String type) {
@@ -160,18 +165,17 @@ class _FooderCommentCardState extends State<FooderCommentCard> {
 
   Widget commentType(RestaurantComment comment) {
     final textTheme = Theme.of(context).textTheme;
-    final IconData icon = commentTypeIcon(comment.type);
+    final String icon = commentTypeIcon(comment.type);
     final String title = commentTypeTitle(comment.type);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Icon(
-          icon,
-          size: 40,
-          color: Theme.of(context).primaryColor,
-        ),
+       Padding(
+         padding: const EdgeInsets.only(right: 10, top: 10),
+        child: SvgPicture.asset(icon)
+       ),
         Text(
           title,
           style: textTheme.subtitle2!.copyWith(
@@ -203,16 +207,31 @@ class _FooderCommentCardState extends State<FooderCommentCard> {
     );
   }
 
-  Widget commentImage() {
+  Widget commentImage({
+    required List<RestaurantCommentPhoto> galleryItems,
+    required int index,
+    required CommentUser user,
+  }) {
     return Row(
       children: [
         InkWell(
           onTap: () {
-            print('images');
+           Navigator.of(context).push(
+             MaterialPageRoute(
+               builder: (context) => FooderPhotoWrapper(
+                 galleryItems: galleryItems,
+                 user: user,
+                 backgroundDecoration: const BoxDecoration(
+                   color: Colors.black,
+                 ),
+                 initialIndex: index,
+               ),
+             )
+           );
           },
           child: CachedNetworkImage(
             fit: BoxFit.cover,
-            imageUrl: "https://images.unsplash.com/photo-1453728013993-6d66e9c9123a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8dmlld3xlbnwwfHwwfHw%3D&w=1000&q=80",
+            imageUrl: galleryItems[index].imageUrl,
             imageBuilder: (ctx, imageProvider) {
               return Container(
                 width: 120,
@@ -244,10 +263,12 @@ class _FooderCommentCardState extends State<FooderCommentCard> {
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          commentImage(),
-          commentImage(),
-          commentImage(),
-          commentImage(),
+          for(var index = 0; index < comment.photos.length ; index++)
+            commentImage(
+              galleryItems: comment.photos,
+              index: index,
+              user: comment.user,
+            ),
         ],
       ),
     );

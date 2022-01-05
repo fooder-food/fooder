@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_notification/bloc/comments/comments_api_provider.dart';
 
 class CommentsRepo {
@@ -14,6 +16,7 @@ class CommentsRepo {
     required String content,
     required int type,
     required String restaurantUniqueId,
-  }) async => _commentApiProvider.addReview(content: content, type: type, restaurantUniqueId: restaurantUniqueId);
+    List<File>? photos,
+  }) async => _commentApiProvider.addReview(content: content, type: type, restaurantUniqueId: restaurantUniqueId, photos: photos);
 
 }

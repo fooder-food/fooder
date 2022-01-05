@@ -1,5 +1,6 @@
 import 'package:flutter_notification/model/comment_user_model.dart';
 import 'package:flutter_notification/model/geo_model.dart';
+import 'package:flutter_notification/model/restaurant_comment_photo_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'restaurant_comment_model.g.dart';
@@ -26,7 +27,7 @@ class RestaurantComment {
   final String type;
   final DateTime createDate;
   final DateTime updateDate;
-  final List<String> photos;
+  final List<RestaurantCommentPhoto> photos;
   final int likeTotal;
   final int replyTotal;
   final CommentUser user;

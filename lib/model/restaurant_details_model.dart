@@ -1,5 +1,6 @@
 import 'package:flutter_notification/model/geo_model.dart';
 import 'package:flutter_notification/model/restaurant_comment_model.dart';
+import 'package:flutter_notification/model/restaurant_comment_photo_model.dart';
 import 'package:flutter_notification/model/restaurant_create_user_model.dart';
 import 'package:flutter_notification/model/restaurant_follower_model.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -54,7 +55,7 @@ class RestaurantDetails {
   final int normal;
   final int bad;
   final double rating;
-  final List<String> photos;
+  final List<RestaurantCommentPhoto> photos;
   final RestaurantCreateUser createUser;
   final List<RestaurantFollower> followers;
   final List<RestaurantComment> comments;

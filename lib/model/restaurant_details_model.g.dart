@@ -28,8 +28,10 @@ RestaurantDetails _$RestaurantDetailsFromJson(Map<String, dynamic> json) =>
       normal: json['normal'] as int,
       bad: json['bad'] as int,
       rating: (json['rating'] as num).toDouble(),
-      photos:
-          (json['photos'] as List<dynamic>).map((e) => e as String).toList(),
+      photos: (json['photos'] as List<dynamic>)
+          .map(
+              (e) => RestaurantCommentPhoto.fromJson(e as Map<String, dynamic>))
+          .toList(),
       comments: (json['comments'] as List<dynamic>)
           .map((e) => RestaurantComment.fromJson(e as Map<String, dynamic>))
           .toList(),
