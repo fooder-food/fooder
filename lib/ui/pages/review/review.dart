@@ -77,7 +77,7 @@ class _FooderRestaurantReviewScreenState extends State<FooderRestaurantReviewScr
                     photos.add(file!);
                   }
                 }
-                print(photos);
+                print(_selectionType);
                 await _commentsRepo.addReview(
                     content: _contentTextEditingController.text,
                     type: _selectionType,
@@ -92,7 +92,7 @@ class _FooderRestaurantReviewScreenState extends State<FooderRestaurantReviewScr
                 setState(() {
                   onSubmit = false;
                 });
-               // Navigator.of(context).pop();
+                Navigator.of(context).pop();
               },
               icon: Icon(
                 Icons.check_rounded,

@@ -10,12 +10,15 @@ import 'package:flutter_notification/bloc/home/home_bloc.dart';
 import 'package:flutter_notification/bloc/restaurant-details/restaurant_details_bloc.dart';
 import 'package:flutter_notification/bloc/search-country/search_country_bloc.dart';
 import 'package:flutter_notification/bloc/search-country/search_country_repo.dart';
+import 'package:flutter_notification/bloc/search_place/search_place_bloc.dart';
 import 'package:flutter_notification/model/providers/user_model.dart';
 import 'package:flutter_notification/model/providers/user_search_radius.dart';
 import 'package:flutter_notification/ui/pages/app.dart';
 import 'package:provider/provider.dart';
 
 import 'core/service/notification/notification_service.dart';
+import 'model/providers/navigator_model.dart';
+import 'model/providers/select_place.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,11 +43,14 @@ void main() async{
             BlocProvider<AuthBloc>(create: (_) => AuthBloc()),
             BlocProvider<HomeBloc>(create: (_)=>HomeBloc(),),
             BlocProvider<RestaurantDetailsBloc>(create: (_) =>RestaurantDetailsBloc()),
+            BlocProvider<SearchPlaceBloc>(create: (_) =>SearchPlaceBloc()),
           ],
           child: MultiProvider(
             providers: [
               ChangeNotifierProvider(create: (_) => AuthModel()),
               ChangeNotifierProvider(create: (_) => UserSearchRadiusModel()),
+              ChangeNotifierProvider(create: (_) => NavigatorModel()),
+              ChangeNotifierProvider(create: (_) => SelectPlaceModel()),
             ],
             child: const MyApp(),
           )

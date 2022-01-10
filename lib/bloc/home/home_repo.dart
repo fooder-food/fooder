@@ -17,9 +17,15 @@ class HomeRepo {
     double? longitude,
     double? latitude,
     double? radius,
+    String? state,
+    required List<String> filter,
+    required int sort,
   }) async => _homeApiProvider.fetchRestaurant(
     longitude: longitude,
     latitude: latitude,
     radius: radius,
+    state: state,
+    sort: sort,
+    filter: filter,
   );
 }

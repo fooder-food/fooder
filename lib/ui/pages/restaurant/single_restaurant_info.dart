@@ -8,6 +8,7 @@ import 'package:flutter_notification/model/geo_model.dart';
 import 'package:flutter_notification/model/providers/user_model.dart';
 import 'package:flutter_notification/ui/pages/restaurant/widget/restaurant_comment.dart';
 import 'package:flutter_notification/ui/shared/widget/custom_app_bar.dart';
+import 'package:flutter_notification/ui/shared/widget/custom_button.dart';
 import 'package:flutter_notification/ui/shared/widget/loading.dart';
 import 'package:flutter_notification/ui/shared/widget/toast.dart';
 import 'package:flutter_svg/svg.dart';
@@ -166,6 +167,84 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
     ));
   }
 
+  String convertOperationTime(List<String> businessHours) {
+    bool allSame = true;
+    bool normalDaySame = false;
+    bool weekendSame = false;
+    List<Map<String, dynamic>> businessHoursList = [];
+    businessHoursList =  businessHours.map((data) {
+      return {
+        "day": data.split(': ')[0],
+        "time": data.split(': ')[1],
+      };
+    }).cast<Map<String, dynamic>>().toList();
+    print('business $businessHoursList');
+    for(var day = 0;day < 5 ; day++) {
+      if(businessHoursList[day]["time"] != businessHoursList[day + 1]["time"]) {
+        allSame = false;
+      }
+
+      if(day<=3) {
+        if(businessHoursList[day]["time"] == businessHoursList[day + 1]["time"]) {
+          normalDaySame = true;
+        } else {
+          normalDaySame = true;
+        }
+      }
+
+      if(day > 3) {
+        if(businessHoursList[day]["time"] == businessHoursList[day + 1]["time"]) {
+          weekendSame = true;
+        } else {
+          weekendSame = true;
+        }
+      }
+    }
+
+    if(allSame) {
+      return businessHoursList[0]["time"];
+    }
+
+    if(weekendSame && normalDaySame) {
+      String normalTime = businessHoursList[0]["time"];
+      String weekendTime = businessHoursList[4]["time"];
+      return 'Mon-Thu: $normalTime \n Fri-Sun: $weekendTime';
+    }
+
+    String totalBusinessHours = '';
+
+    for(var day = 0;day < businessHoursList.length -1; day++) {
+      if(day != businessHoursList.length -1) {
+        totalBusinessHours = '${convertDayShortName(businessHoursList[day]["day"])}: ${businessHoursList[day]["time"]} \n';
+      } else {
+        totalBusinessHours = '${convertDayShortName(businessHoursList[day]["day"])}: ${businessHoursList[day]["time"]}';
+      }
+    }
+
+    return totalBusinessHours;
+
+  }
+
+
+  String convertDayShortName(String day) {
+    switch(day.toUpperCase()) {
+      case 'MONDAY':
+        return 'Mon';
+      case 'TUESDAY':
+        return 'Tue';
+      case 'WEDNESDAY':
+        return 'Wed';
+      case 'THURSDAY':
+        return 'Thu';
+      case 'FRIDAY':
+        return 'Fri';
+      case 'SATURDAY':
+        return 'Sat';
+      default:
+        return 'Sun';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -207,6 +286,8 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
           ),
           restaurantGeoFunctionList(state),
           const Divider(),
+          if(state.restaurant!.restaurantPhone.isNotEmpty)
+            callPhoneButton(state),
           restaurantExtraInfo(state),
           const Divider(),
           reportSection(),
@@ -690,6 +771,46 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
     );
   }
 
+  Widget callPhoneButton(RestaurantDetailsState state) {
+    return Column(
+      children: [
+        Container(
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            child: ElevatedButton(
+                style: ButtonStyle(
+                  elevation: MaterialStateProperty.all<double>(0),
+                  side: MaterialStateProperty.all<BorderSide>(
+                      BorderSide(
+                        color:Theme.of(context).secondaryHeaderColor,
+                      )
+                  ),
+                  padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                    const EdgeInsets.symmetric(vertical: 20),
+                  ),
+                  backgroundColor:MaterialStateProperty.all<Color>(
+                      Colors.white
+                  ),
+                  // shape: MaterialStateProperty.all<StadiumBorder>(
+                  //   const StadiumBorder(),
+                  // ),
+                ),
+                onPressed: () {
+                  launch("tel://${state.restaurant!.restaurantPhone}");
+                },
+                child: Text(
+                  'Call',
+                  style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                    color: Theme.of(context).secondaryHeaderColor,
+                  ),
+                )
+            )
+        ),
+        const Divider(),
+      ],
+    );
+  }
+
   Widget restaurantExtraInfo(RestaurantDetailsState state) {
     final textTheme = Theme.of(context).textTheme;
     final dateFormatter = DateFormat('yyyy-MM-dd');
@@ -702,11 +823,11 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-               'Extra Information',
+               'Business Information',
                 style: textTheme.subtitle1,
               ),
               Text(
-                'Update Date $formatDate',
+                'Last Updated: $formatDate',
                 style: textTheme.subtitle2!.copyWith(
                   fontWeight: FontWeight.normal,
                   color: Theme.of(context).secondaryHeaderColor,
@@ -717,6 +838,53 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
           const SizedBox(
             height: 10,
           ),
+          if(state.restaurant!.breakTime.isNotEmpty)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Off Days',
+                style: textTheme.subtitle2!.copyWith(
+                  fontWeight: FontWeight.normal,
+                  color: Theme.of(context).secondaryHeaderColor,
+                  fontSize: 16,
+                ),
+              ),
+              Text(
+                '${state.restaurant!.breakTime}',
+                style: textTheme.subtitle1!.copyWith(
+                  fontWeight: FontWeight.normal,
+                ),
+              )
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          if(state.restaurant!.businessHour.isNotEmpty)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Business Hours',
+                style: textTheme.subtitle2!.copyWith(
+                  fontWeight: FontWeight.normal,
+                  color: Theme.of(context).secondaryHeaderColor,
+                  fontSize: 16,
+                ),
+              ),
+              Text(
+                convertOperationTime(state.restaurant!.businessHour),
+                style: textTheme.subtitle1!.copyWith(
+                  fontWeight: FontWeight.normal,
+                ),
+              )
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -739,39 +907,39 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
           const SizedBox(
             height: 10,
           ),
-          Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-             Ink(
-               decoration: BoxDecoration(
-                 borderRadius: BorderRadius.circular(10),
-               ),
-               child: InkWell(
-                 onTap: () {},
-                 child: Container(
-                   padding: const EdgeInsets.all(5),
-                   child: Row(
-                     children: [
-                       Text('View More Information',
-                         style: textTheme.subtitle2!.copyWith(
-                           fontSize: 14,
-                           fontWeight: FontWeight.normal,
-                           color: Theme.of(context).secondaryHeaderColor,
-                         ),
-                       ),
-                       Icon(
-                         Icons.chevron_right_rounded,
-                         size: 20,
-                         color: Theme.of(context).secondaryHeaderColor,
-                       ),
-                     ],
-                   ),
-                 ),
-               ),
-             )
-            ],
-          )
+          // Row(
+          //   mainAxisSize: MainAxisSize.max,
+          //   mainAxisAlignment: MainAxisAlignment.end,
+          //   children: [
+          //    Ink(
+          //      decoration: BoxDecoration(
+          //        borderRadius: BorderRadius.circular(10),
+          //      ),
+          //      child: InkWell(
+          //        onTap: () {},
+          //        child: Container(
+          //          padding: const EdgeInsets.all(5),
+          //          child: Row(
+          //            children: [
+          //              Text('View More Information',
+          //                style: textTheme.subtitle2!.copyWith(
+          //                  fontSize: 14,
+          //                  fontWeight: FontWeight.normal,
+          //                  color: Theme.of(context).secondaryHeaderColor,
+          //                ),
+          //              ),
+          //              Icon(
+          //                Icons.chevron_right_rounded,
+          //                size: 20,
+          //                color: Theme.of(context).secondaryHeaderColor,
+          //              ),
+          //            ],
+          //          ),
+          //        ),
+          //      ),
+          //    )
+          //   ],
+          // )
         ],
       ),
     );
@@ -780,7 +948,9 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
   Widget reportSection() {
     final textTheme = Theme.of(context).textTheme;
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Navigator.of(context).pushNamed('/report');
+      },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         child: Row(
@@ -793,17 +963,19 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
                 children: [
                   Icon(
                     Icons.error_outline,
-                    size: 30,
+                    size: 20,
                     color: Theme.of(context).secondaryHeaderColor,
                   ),
                   const SizedBox(
                     width: 10,
                   ),
-                  Text(
-                    'If any error message please tell us',
-                    style: textTheme.subtitle2!.copyWith(
-                      color: Theme.of(context).secondaryHeaderColor,
-                      fontSize: 16,
+                  Expanded(
+                    child: Text(
+                      'Tell us if you see any incorrect information',
+                      style: textTheme.subtitle2!.copyWith(
+                        color: Theme.of(context).secondaryHeaderColor,
+                        fontSize: 15,
+                      ),
                     ),
                   ),
                 ],

@@ -10,6 +10,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Fooder',
+      debugShowCheckedModeBanner: false,
       theme: FooderAppTheme.lightTheme,
       darkTheme: FooderAppTheme.darkTheme,
       initialRoute: FooderRoute.initialRouteName,

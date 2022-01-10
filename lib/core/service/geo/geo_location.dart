@@ -30,7 +30,6 @@ class GeoLocationService {
     if (!serviceEnabled) {
       await Geolocator.getCurrentPosition();
       serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      Navigator.of(context).pop();
       print(serviceEnabled);
       if(!serviceEnabled) {
         return Future.error('Location services are disabled.');

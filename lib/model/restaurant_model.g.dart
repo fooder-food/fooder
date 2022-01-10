@@ -14,7 +14,7 @@ Restaurant _$RestaurantFromJson(Map<String, dynamic> json) => Restaurant(
       comments: json['comments'] as String,
       follower: json['follower'] as String,
       rating: (json['rating'] as num).toDouble(),
-      distance: (json['distance'] as num).toDouble(),
+      distance: (json['distance'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$RestaurantToJson(Restaurant instance) =>

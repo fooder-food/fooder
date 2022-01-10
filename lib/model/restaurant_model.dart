@@ -12,7 +12,7 @@ class Restaurant {
     required this.comments,
     required this.follower,
     required this.rating,
-    required this.distance,
+    this.distance,
   });
 
   factory Restaurant.fromJson(Map<String, dynamic> json) => _$RestaurantFromJson(json);
@@ -25,5 +25,5 @@ class Restaurant {
   final String comments;
   final String follower;
   final double rating;
-  final double distance;
+  final double? distance;
 }

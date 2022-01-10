@@ -75,6 +75,8 @@ dependencies:
   path_provider: ^2.0.8
   gallery_saver: ^2.3.2
   photo_view: ^0.13.0
+  azlistview: ^2.0.0-nullsafety.0
+  country_list_pick: ^1.0.1+5
 
 dev_dependencies:
   flutter_test:
@@ -107,6 +109,7 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
+    - assets/data/china.json
     - assets/img/error-404.svg
     - assets/img/loading.svg
     - assets/img/login_image.jpg
@@ -114,6 +117,11 @@ flutter:
     - assets/img/delicious.svg
     - assets/img/notBad.svg
     - assets/img/normal.svg
+    - assets/img/find_location.svg
+    - assets/img/my_list.svg
+    - assets/img/search.svg
+    - assets/img/favorite.svg
+    - assets/img/Icon_plus.svg
     - .env
     - assets/locale/localization_en.json
     - assets/locale/localization_cn.json

@@ -44,8 +44,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           emit(AuthenticatingState());
           String email = event.email;
           String password = event.password;
-          final messaging = FirebaseMessaging.instance;
-          final token = await messaging.getToken();
+        //  final messaging = FirebaseMessaging.instance;
+          final token = await FirebaseMessaging.instance.getToken();
+          print(token);
           final Auth auth = await _authRepo.login(email: email, password: password, deviceToken: token!);
           if(auth.user == null) {
             emit(UnAuthenticatedState(auth));

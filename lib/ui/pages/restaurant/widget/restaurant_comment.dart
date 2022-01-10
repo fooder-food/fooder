@@ -168,23 +168,33 @@ class _FooderCommentCardState extends State<FooderCommentCard> {
     final String icon = commentTypeIcon(comment.type);
     final String title = commentTypeTitle(comment.type);
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-       Padding(
-         padding: const EdgeInsets.only(right: 10, top: 10),
-        child: SvgPicture.asset(icon)
-       ),
-        Text(
-          title,
-          style: textTheme.subtitle2!.copyWith(
-            fontWeight: FontWeight.normal,
-            fontSize: 12,
-            color: Theme.of(context).primaryColor,
-          ) ,
-        )
-      ],
+    return Container(
+      width: 60,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            child: SvgPicture.asset(icon)
+          ),
+         // Padding(
+         //   padding: const EdgeInsets.only(right: 10, top: 10),
+         //  child: SvgPicture.asset(icon)
+         // ),
+          Center(
+            child: Text(
+              title,
+              style: textTheme.subtitle2!.copyWith(
+                fontWeight: FontWeight.w400,
+                fontSize: 12,
+                color: Theme.of(context).primaryColor,
+              ) ,
+            ),
+          )
+        ],
+      ),
     );
   }
 

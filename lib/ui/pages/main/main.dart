@@ -6,8 +6,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_notification/core/service/storage/storage_service.dart';
 import 'package:flutter_notification/model/auth_model.dart';
+import 'package:flutter_notification/model/providers/navigator_model.dart';
 import 'package:flutter_notification/model/providers/user_model.dart';
 import 'package:flutter_notification/ui/pages/main/init_items.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:provider/src/provider.dart';
 
 class FooderMainScreen extends StatefulWidget {
@@ -19,54 +23,51 @@ class FooderMainScreen extends StatefulWidget {
 }
 
 class _FooderMainScreenState extends State<FooderMainScreen> with AfterLayoutMixin<FooderMainScreen> {
-  int _activeIndex = 0;
 
   @override
   void initState() {
     super.initState();
   }
 
+
   void addRestaurant(BuildContext context) {
     Navigator.of(context).pushNamed('/add-restaurant');
   }
   @override
   Widget build(BuildContext context) {
-    final themeColor = Theme.of(context);
     return Scaffold(
-      body: Container(
-        child: IndexedStack(
-          index: _activeIndex,
-          children: pages,
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: themeColor.primaryColor,
-        onPressed: () {
-          addRestaurant(context);
-        },
-        child: const Icon(Icons.add),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-      bottomNavigationBar: AnimatedBottomNavigationBar.builder(
-        itemCount: 3,
-        gapLocation: GapLocation.end,
-        notchSmoothness: NotchSmoothness.defaultEdge,
-        height: 70,
-            elevation: 10,
-        tabBuilder: (index, isActive) {
-          final Color color = _activeIndex == index ? themeColor.primaryColor : themeColor.unselectedWidgetColor;
-          return Icon(
-            iconList[index],
-            color: color,
-            size: 30,
+      body: Consumer<NavigatorModel>(
+        builder: (_, navigatorModel, __) {
+          return Container(
+            child: IndexedStack(
+              index: navigatorModel.index,
+              children: pages,
+            ),
           );
-         },
-        activeIndex: _activeIndex,
-        onTap: (index) {
-          setState(() {
-            _activeIndex = index;
-          });
-        }),
+        },
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
+        currentIndex: context.watch<NavigatorModel>().index,
+        onTap: (value) {
+          if(value !=2) {
+           context.read<NavigatorModel>().updateIndex(value);
+          }
+        },
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Colors.black,
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
+        elevation: 5,
+        items: <BottomNavigationBarItem>[
+          for(var index = 0; index < iconList.length; index ++)
+          BottomNavigationBarItem(
+            label: iconList[index]["title"],
+            icon: navIcon(index, iconList[index]["icon"]),
+          ),
+        ],
+      ), // This tra
     );
   }
 
@@ -83,8 +84,54 @@ class _FooderMainScreenState extends State<FooderMainScreen> with AfterLayoutMix
 
       // keep user login.
       final Auth auth = Auth.fromJson(decoded);
-
+      print('user token${auth.token}');
       context.read<AuthModel>().setUser(auth);
     }
+  }
+
+
+  Widget navIcon(int index, String icon) {
+    int _activeIndex = context.watch<NavigatorModel>().index;
+    if(index != 2)  {
+      return Stack(
+        children: [
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                decoration: const BoxDecoration(
+                  shape: BoxShape.rectangle,
+                  color: Colors.red,
+                ),
+                width: index == _activeIndex ? 24 : 0,
+                height: index == _activeIndex ? 1.5 : 0,
+              ),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.only(top: 10.0, bottom: 5.0),
+            child: SvgPicture.asset(icon, width: 24, color: Colors.black),
+          ),
+        ],
+      );
+    }
+    return Center(
+      child: GestureDetector(
+        onTap: () {
+          addRestaurant(context);
+        },
+        child: Container(
+          // width: 100,
+          // height: 50,
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Theme.of(context).primaryColor,
+          ),
+          //margin: const EdgeInsets.only(top: 10.0),
+          child: SvgPicture.asset(icon, width: 26, color: Colors.white),
+        ),
+      ),
+    );
   }
 }

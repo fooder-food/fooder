@@ -11,8 +11,14 @@ class FetchAllRestaurant extends HomeEvent {
     this.radius,
     this.longitude,
     this.latitude,
+    this.state,
+    required this.sort,
+    required this.filter,
 });
   final double? radius;
   final double? latitude;
   final double? longitude;
+  final int sort;
+  final List<String> filter;
+  final String? state;
 }

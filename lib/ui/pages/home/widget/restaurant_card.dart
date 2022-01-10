@@ -26,14 +26,17 @@ class _FooderRestaurantCardState extends State<FooderRestaurantCard> {
     });
   }
 
-  String distanceFormatter(double distance) {
+  String distanceFormatter(double? distance) {
+    if(distance == null) {
+      return '';
+    }
     if(distance < 1000) {
-      return '${distance.round()}m';
+      return '- ${distance.round()}m';
     }
     double totalDistance = distance / 1000;
     int distanceDecimal = totalDistance.truncate();
     double distancePoint = totalDistance - distanceDecimal;
-    return '${totalDistance.toStringAsFixed(2)}km';
+    return '- ${totalDistance.toStringAsFixed(2)}km';
   }
   @override
   Widget build(BuildContext context) {
@@ -84,7 +87,8 @@ class _FooderRestaurantCardState extends State<FooderRestaurantCard> {
                               const SizedBox(
                                 height: 5,
                               ),
-                              Text('${restaurant.state} - ${distanceFormatter(restaurant.distance)}', style: textTheme.subtitle2!.copyWith(
+                              Text('${restaurant.state} ${distanceFormatter(restaurant.distance)}',
+                                style: textTheme.subtitle2!.copyWith(
                                 fontSize: 12,
                                 color: Colors.grey[600],
                               ),),

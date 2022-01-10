@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_notification/core/service/network/config.dart';
 import 'package:flutter_notification/core/service/storage/storage_service.dart';
 import 'package:flutter_notification/model/auth_model.dart';
@@ -52,6 +53,17 @@ class NetworkService {
     init();
   }
 
+  NetworkService._countryStateConstructor() {
+    init(
+      baseOptions: BaseOptions(
+        baseUrl: 'https://api.countrystatecity.in/v1/',
+        headers: {
+          "X-CSCAPI-KEY": dotenv.env["COUNTRY_API_KEY"],
+        }
+      ),
+    );
+  }
+
   NetworkService._countryConstructor() {
     init(
       baseOptions: BaseOptions(
@@ -71,6 +83,7 @@ class NetworkService {
   static final _service = NetworkService._constructor();
   static final _countryService = NetworkService._countryConstructor();
   static final _googleApiService = NetworkService._googleApiConstructor();
+  static final _countryStateServce = NetworkService._countryStateConstructor();
 
   factory NetworkService() => _service;
 
@@ -78,6 +91,10 @@ class NetworkService {
 
   factory NetworkService.country() {
     return _countryService;
+  }
+
+  factory NetworkService.countryState() {
+    return _countryStateServce;
   }
 
   Future<Response> get(String url, {
