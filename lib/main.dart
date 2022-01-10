@@ -10,6 +10,7 @@ import 'package:flutter_notification/bloc/home/home_bloc.dart';
 import 'package:flutter_notification/bloc/restaurant-details/restaurant_details_bloc.dart';
 import 'package:flutter_notification/bloc/search-country/search_country_bloc.dart';
 import 'package:flutter_notification/bloc/search-country/search_country_repo.dart';
+import 'package:flutter_notification/bloc/search-restaurant/search_restaurant_bloc.dart';
 import 'package:flutter_notification/bloc/search_place/search_place_bloc.dart';
 import 'package:flutter_notification/model/providers/user_model.dart';
 import 'package:flutter_notification/model/providers/user_search_radius.dart';
@@ -44,6 +45,7 @@ void main() async{
             BlocProvider<HomeBloc>(create: (_)=>HomeBloc(),),
             BlocProvider<RestaurantDetailsBloc>(create: (_) =>RestaurantDetailsBloc()),
             BlocProvider<SearchPlaceBloc>(create: (_) =>SearchPlaceBloc()),
+            BlocProvider<SearchRestaurantBloc>(create: (_) =>SearchRestaurantBloc()),
           ],
           child: MultiProvider(
             providers: [
