@@ -34,3 +34,8 @@ class SetRestaurantPhonePrefix extends AddRestaurantEvent {
   SetRestaurantPhonePrefix(this.prefix);
   String prefix;
 }
+
+class SetRestaurantImage extends AddRestaurantEvent {
+  SetRestaurantImage(this.file);
+  XFile file;
+}

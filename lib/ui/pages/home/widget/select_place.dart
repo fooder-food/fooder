@@ -24,7 +24,7 @@ class _FooderSelectPlaceScreenState extends State<FooderSelectPlaceScreen> {
     super.initState();
     _seachPlaceBloc = BlocProvider.of<SearchPlaceBloc>(context);
     _homeBloc = BlocProvider.of<HomeBloc>(context);
-    _seachPlaceBloc.add(const FetchCountry());
+    _seachPlaceBloc.add(const FetchStateBasedOnCountry('MY'));
   }
 
   Widget header() {

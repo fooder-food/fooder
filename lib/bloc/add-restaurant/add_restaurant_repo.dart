@@ -1,5 +1,6 @@
 import 'package:flutter_notification/bloc/add-restaurant/restaurant_categories_api_provider.dart';
 import 'package:flutter_notification/model/restaurant_category_model.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AddRestaurantRepo {
   factory AddRestaurantRepo() {
@@ -18,7 +19,9 @@ class AddRestaurantRepo {
     required String placeId,
     required String phoneNumber,
     required String selectedCategoryId,
+    required XFile image,
   }) async => _restaurantCategoriesApiProvider.addRestaurant(
+      image: image,
       restaurantName: restaurantName,
       restaurantAddress: restaurantAddress,
       placeId: placeId,

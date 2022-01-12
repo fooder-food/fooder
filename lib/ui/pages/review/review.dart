@@ -68,9 +68,9 @@ class _FooderRestaurantReviewScreenState extends State<FooderRestaurantReviewScr
               onPressed: () async {
                 List<File> photos = [];
                 print(restaurantUniqueId);
-                if(onSubmit) {
-                  return;
-                }
+                // if(onSubmit) {
+                //   return;
+                // }
                 if(_selectedMedia.isNotEmpty) {
                   for (var media in _selectedMedia) {
                     final file = await media.file;
@@ -85,13 +85,13 @@ class _FooderRestaurantReviewScreenState extends State<FooderRestaurantReviewScr
                     photos: photos.isEmpty ? null : photos,
                 );
 
-                setState(() {
-                  onSubmit = true;
-                });
+                // setState(() {
+                //   onSubmit = true;
+                // });
                 await Future.delayed(const Duration(milliseconds: 500));
-                setState(() {
-                  onSubmit = false;
-                });
+                // setState(() {  
+                //   onSubmit = false;
+                // });
                 Navigator.of(context).pop();
               },
               icon: Icon(

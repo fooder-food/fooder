@@ -1,5 +1,4 @@
 
-import 'package:azlistview/azlistview.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'find_place_state_model.g.dart';

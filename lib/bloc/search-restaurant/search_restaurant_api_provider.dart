@@ -40,6 +40,26 @@ class SearchRestaurantApiProvider {
     }
   }
 
+  Future<List<RestaurantSearchHistory>> delSearchHistory({
+    required String uniqueId
+  }) async {
+    try {
+      final body = {
+        "isActive": 1,
+        "restaurantUniqueId": uniqueId,
+      };
+      final response = await _networkService.put('history/update', data: body);
+      final data = response.data!["data"];
+      final List<RestaurantSearchHistory> historyList = List.from(
+        data.map((history) => RestaurantSearchHistory.fromJson(history)),
+      );
+      return historyList;
+    } catch(e) {
+      debugPrint("err cat: ${e.toString()}");
+      throw Exception(e);
+    }
+  }
+
   Future<void> addSearchHistory({
     required String title,
     required String restaurantUniqueId,

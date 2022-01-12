@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_notification/bloc/home/home_bloc.dart';
@@ -43,6 +44,7 @@ class _FooderRestaurantCardState extends State<FooderRestaurantCard> {
     if(widget.state.status == HomeStatus.onLoadRestaurantData) {
       return onLoadingSkeleton();
     } else if(widget.state.status == HomeStatus.loadRestaurantDataSuccess) {
+      print(widget.state.restaurants[0].image);
       return restaurantContainer();
     }
     return FooderUnknownScreen();
@@ -66,8 +68,22 @@ class _FooderRestaurantCardState extends State<FooderRestaurantCard> {
           children: [
             Container(
               height: 130,
-              decoration: BoxDecoration(
-                color: _skeletonColor,
+              child: CachedNetworkImage(
+                fit: BoxFit.cover,
+                imageUrl: restaurant.image,
+                imageBuilder: (ctx, imageProvider) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: imageProvider,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  );
+                },
+                placeholder: (context, url) =>
+                const Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) => const Center(child: Icon(Icons.error)),
               ),
             ),
             Expanded(

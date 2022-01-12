@@ -21,4 +21,8 @@ class SearchRestaurantRepo {
     required String title,
     required String restaurantUniqueId
   }) => _searchRestaurantApiProvider.addSearchHistory(title: title, restaurantUniqueId: restaurantUniqueId);
-  }
+
+  Future<List<RestaurantSearchHistory>> delSearchHistory({
+  required String uniqueId,
+}) => _searchRestaurantApiProvider.delSearchHistory(uniqueId: uniqueId);
+}

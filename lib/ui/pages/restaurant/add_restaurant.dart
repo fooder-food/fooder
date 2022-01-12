@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:country_code_picker/country_code_picker.dart';
@@ -14,6 +16,7 @@ import 'package:flutter_notification/ui/shared/widget/custom_button.dart';
 import 'package:flutter_notification/ui/shared/widget/custom_text_form_field.dart';
 import 'package:flutter_notification/ui/shared/widget/loading.dart';
 import 'package:flutter_notification/ui/shared/widget/toast.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class FooderAddRestaurantScreen extends StatefulWidget {
@@ -32,6 +35,7 @@ class _FooderAddRestaurantScreenState extends State<FooderAddRestaurantScreen> {
   late TextEditingController _restaurantNameController;
   late TextEditingController _phoneController;
   final _geolocationService = GeoLocationService();
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -108,6 +112,56 @@ class _FooderAddRestaurantScreenState extends State<FooderAddRestaurantScreen> {
     );
   }
 
+  void _getImageFromCamera() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+    if(image != null) {
+      _addRestaurantBloc.add(SetRestaurantImage(image));
+      // setState(() {
+      //   //_tempAvatar = File(image.path.toString());
+      // //  _tempAvatar = image;
+      // });
+      Navigator.of(context).pop();
+    }
+  }
+
+  void _getImageFromGallery() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if(image != null) {
+      _addRestaurantBloc.add(SetRestaurantImage(image));
+      Navigator.of(context).pop();
+    }
+  }
+
+  void _imagePickerShowActionSheet(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    showAdaptiveActionSheet(
+      context: context,
+      title: Text('Select Action', style: textTheme.subtitle1,),
+      actions: <BottomSheetAction>[
+        BottomSheetAction(
+            leading: Container(
+              padding: const EdgeInsets.only(right: 10),
+              child: const Icon(Icons.camera, color: Colors.grey,),
+            ),
+            title: Text('Camera', style: textTheme.subtitle1,),
+            onPressed: () {
+              _getImageFromCamera();
+            }
+        ),
+        BottomSheetAction(
+            leading: Container(
+              padding: const EdgeInsets.only(right: 10),
+              child: const Icon(Icons.drive_folder_upload_rounded, color: Colors.grey,),
+            ),
+            title: Text('Upload From Device', style: textTheme.subtitle1,),
+            onPressed: () {
+              _getImageFromGallery();
+            }
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final appbarTheme = Theme.of(context).appBarTheme;
@@ -156,14 +210,12 @@ class _FooderAddRestaurantScreenState extends State<FooderAddRestaurantScreen> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children:  [
+                                restaurantImagePicker(state),
                                 getRestaurantName(),
                                 getAddressTextFormField(context),
                                 getCategoriesList(state.categories),
                                 getRestaurantPhoneNumber(),
                                 addRestaurantSubmitButton(),
-                                ElevatedButton(onPressed: () {
-                                  context.read<AuthModel>().logoutUser();
-                                }, child: const Text('log out')),
                               ],
                             ),
                           ),
@@ -339,6 +391,38 @@ class _FooderAddRestaurantScreenState extends State<FooderAddRestaurantScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget restaurantImagePicker(AddRestaurantState state) {
+    return InkWell(
+      onTap: () {
+        _imagePickerShowActionSheet(context);
+      },
+        child: Container(
+          width: 150,
+          height: 150,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: Theme.of(context).secondaryHeaderColor,
+            )
+          ),
+          child:state.image == null
+              ? Center(
+                  child: Icon(
+                    Icons.add,
+                  color:  Theme.of(context).secondaryHeaderColor,
+                  size: 40,
+                ),
+              )
+            : Image.file(
+            File(state.image!.path.toString()),
+            fit: BoxFit.cover,
+            width: 150,
+            height: 150,
+          ),
+        )
     );
   }
 

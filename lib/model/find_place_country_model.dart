@@ -1,11 +1,10 @@
 
-import 'package:azlistview/azlistview.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'find_place_country_model.g.dart';
 
 @JsonSerializable()
-class FindPlaceCountry extends ISuspensionBean {
+class FindPlaceCountry {
   FindPlaceCountry({
     required this.id,
     required this.name,
@@ -21,10 +20,5 @@ class FindPlaceCountry extends ISuspensionBean {
   final String name;
   final String iso2;
   String? tagIndex;
-
-  @override
-  String getSuspensionTag() {
-    return tagIndex ?? '';
-  }
 
 }

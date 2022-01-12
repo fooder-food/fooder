@@ -22,6 +22,7 @@ class StorageService {
     return prefs.getString(key);
   }
 
+
   Future<void> remove(String key) async {
     final SharedPreferences prefs = await storage;
     prefs.remove(key);

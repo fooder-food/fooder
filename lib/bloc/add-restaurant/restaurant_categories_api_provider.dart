@@ -1,6 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_notification/core/service/network/network_service.dart';
 import 'package:flutter_notification/model/restaurant_category_model.dart';
+import 'package:image_picker/image_picker.dart';
 
 class RestaurantCategoriesApiProvider {
   final NetworkService _networkService = NetworkService();
@@ -24,6 +26,7 @@ class RestaurantCategoriesApiProvider {
     required String placeId,
     required String phoneNumber,
     required String selectedCategoryId,
+    required XFile image,
   }) async {
     final mapData = {
       'restaurantName': restaurantName,
@@ -31,8 +34,12 @@ class RestaurantCategoriesApiProvider {
       'placeId': placeId,
       'phoneNumber': phoneNumber,
       'selectedCategoryUniqueId': selectedCategoryId,
+      "image": await MultipartFile.fromFile(
+        image.path,
+        filename: image.path.split('/').last,
+      )
     };
-   final response = await _networkService.post('restaurants/create', data: mapData);
+   final response = await _networkService.post('restaurants/create', data: mapData, isFormData: true);
    return response.data;
   }
 

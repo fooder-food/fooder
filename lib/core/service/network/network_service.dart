@@ -17,7 +17,6 @@ class NetworkService {
   void init({Interceptor? customInterceptor, BaseOptions? baseOptions}) {
     final defaultBaseOptions = BaseOptions(
       baseUrl: HttpConfig.baseURL,
-      connectTimeout: HttpConfig.timeout,
     );
     _dio.options = baseOptions ?? defaultBaseOptions;
     //interceptors

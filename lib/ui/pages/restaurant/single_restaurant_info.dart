@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,7 +8,6 @@ import 'package:flutter_notification/model/geo_model.dart';
 import 'package:flutter_notification/model/providers/user_model.dart';
 import 'package:flutter_notification/ui/pages/restaurant/widget/restaurant_comment.dart';
 import 'package:flutter_notification/ui/shared/widget/custom_app_bar.dart';
-import 'package:flutter_notification/ui/shared/widget/custom_button.dart';
 import 'package:flutter_notification/ui/shared/widget/loading.dart';
 import 'package:flutter_notification/ui/shared/widget/toast.dart';
 import 'package:flutter_svg/svg.dart';
@@ -72,11 +71,24 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
   }
   
   void _copyAddress(String data) {
-    Clipboard.setData(ClipboardData(text: data));
-    showToast(
-      context: context,
-      msg: 'Copy Address Successful'
+    //await FlutterClipboard.copy(data);
+    final copyData = ClipboardData(text: data);
+    print(copyData.text);
+    Clipboard.setData(copyData).then(
+        (value) {
+          showToast(
+          context: context,
+          msg: 'Copy Address Successful'
+          );
+        },
+      onError: (err) {
+        showToast(
+            context: context,
+            msg: "Error"
+        );
+      }
     );
+
   }
 
   _ifIsGuest() {
@@ -99,14 +111,17 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
   }
 
   void _writeComment() async {
-    _ifIsGuest();
-    print('unique comment is $restaurantUniqueId');
-    await Navigator.of(context).pushNamed('/review',arguments: {
-    'uniqueId': restaurantUniqueId ,
-    });
-    _restaurantDetailsBloc.add(FetchRestaurantInfo(restaurantUniqueId,
-      userUniqueId: auth.user?.user?.uniqueId,
-    ));
+    if(auth.user == null) {
+      await Navigator.of(context).pushNamed('/login');
+    } else {
+      await Navigator.of(context).pushNamed('/review',arguments: {
+        'uniqueId': restaurantUniqueId ,
+      });
+      _restaurantDetailsBloc.add(FetchRestaurantInfo(restaurantUniqueId,
+        userUniqueId: auth.user?.user?.uniqueId,
+      ));
+    }
+
 
   }
 
@@ -274,7 +289,7 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
         children: [
           SizedBox(
               height: 150,
-              child: restaurantImage()
+              child: restaurantImage(state)
           ),
           restaurantInfo(state),
           restaurantSelection(state),
@@ -298,34 +313,56 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
     );
   }
 
-  Widget restaurantImage() {
+  Widget restaurantImage(RestaurantDetailsState state) {
     final textTheme = Theme.of(context).textTheme;
     return ListView.separated(
-      itemCount: imageList.length <= 5 ? imageList.length : 5 ,
+      itemCount: state.restaurant!.photos.length <= 5 ? state.restaurant!.photos.length : 5 ,
       scrollDirection: Axis.horizontal,
       itemBuilder: (context, index) {
-        bool isLast = index == 4;
+        bool isLast = state.restaurant!.photos.length == 4;
         return Material(
             child: Ink(
               width: 150,
               height: 150,
-              decoration: BoxDecoration(
-                  color:isLast ? Colors.black87 : Colors.transparent,
-                  image: DecorationImage(
-                    fit: BoxFit.cover,
-                    colorFilter:isLast ?
-                      ColorFilter.mode(Colors.black.withOpacity(0.4),
-                          BlendMode.dstATop)
-                      : null,
-                    image: NetworkImage(
-                        imageList[index]
-                    ),
-                  )
-              ),
+              // decoration: BoxDecoration(
+              //     color:isLast ? Colors.black87 : Colors.transparent,
+              //     image: DecorationImage(
+              //       fit: BoxFit.cover,
+
+              //       image: NetworkImage(
+              //           imageList[index]
+              //       ),
+              //     )
+              // ),
               child: InkWell(
                 onTap: () {},
                 child: Stack(
                   children: [
+                    Positioned.fill(
+                      child: CachedNetworkImage(
+                        fit: BoxFit.cover,
+                        imageUrl: state.restaurant!.photos[index].imageUrl,
+                        imageBuilder: (ctx, imageProvider) {
+                          return Container(
+
+                            decoration: BoxDecoration(
+                              color:isLast ? Colors.black87 : Colors.transparent,
+                              image: DecorationImage(
+                                image: imageProvider,
+                                colorFilter:isLast ?
+                                ColorFilter.mode(Colors.black.withOpacity(0.4),
+                                    BlendMode.dstATop)
+                                    : null,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          );
+                        },
+                        placeholder: (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                        errorWidget: (context, url, error) => const Center(child: Icon(Icons.error)),
+                      ),
+                    ),
                     isLast ?
                     Align(
                       child: Text(

@@ -3,6 +3,8 @@ part of 'add_restaurant_bloc.dart';
 enum AddRestaurantFormStatus {
   initial,
   onLoad,
+  onAddRestaurantImage,
+  addedRestaurantImage,
   onInsertRestaurantName,
   insertedRestaurantName,
   onInsertPhone,
@@ -30,6 +32,7 @@ class AddRestaurantState extends Equatable {
     this.selectedCategoyId,
     this.phoneNumber = "",
     this.phonePrefix = "",
+    this.image,
   });
 
   String restaurantName;
@@ -39,6 +42,7 @@ class AddRestaurantState extends Equatable {
   String? selectedCategoyId;
   String? phoneNumber;
   String? phonePrefix;
+  XFile? image;
 
   AddRestaurantState copyState({
     String? restaurantName,
@@ -48,6 +52,7 @@ class AddRestaurantState extends Equatable {
     AddRestaurantFormStatus? status,
     String? phoneNumber,
     String? phonePrefix = "+60",
+    XFile? image,
   }) {
     return AddRestaurantState(
       restaurantName: restaurantName ?? this.restaurantName,
@@ -57,12 +62,13 @@ class AddRestaurantState extends Equatable {
       status: status ?? this.status,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       phonePrefix:  phonePrefix ?? this.phonePrefix,
+      image: image ?? this.image,
     );
   }
 
   @override
   // TODO: implement props
-  List<Object?> get props => [restaurantName, placeDetails, status, categories, selectedCategoyId];
+  List<Object?> get props => [restaurantName, placeDetails, status, categories, selectedCategoyId, image];
 
 }
 

@@ -848,7 +848,7 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
               childAspectRatio: 1,
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
-              mainAxisExtent: 220,
+              mainAxisExtent: 230,
             ),
             delegate: SliverChildBuilderDelegate(
                   (context, index) {

@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_notification/bloc/search-restaurant/search_restaurant_bloc.dart';
 import 'package:flutter_notification/bloc/search-restaurant/search_restaurant_repo.dart';
+import 'package:flutter_notification/core/service/storage/storage_service.dart';
 import 'package:flutter_notification/model/providers/user_model.dart';
 import 'package:flutter_notification/model/restaurant_search_history_model.dart';
 import 'package:flutter_notification/model/search_restaurant_model.dart';
@@ -28,7 +31,7 @@ class _FooderSearchScreenState extends State<FooderSearchScreen> {
   void initState() {
     _searchRestaurantBloc = BlocProvider.of<SearchRestaurantBloc>(context);
     _searchController = TextEditingController();
-    _searchRestaurantBloc.add(const GetSearchHistory());
+    Future(() => getHistory());
     _searchController.addListener(() {
       if(_searchController.text.isNotEmpty) {
         _searchRestaurantBloc.add(SearchResturantByKeyword(_searchController.text));
@@ -36,13 +39,34 @@ class _FooderSearchScreenState extends State<FooderSearchScreen> {
           _iskey = true;
         });
       } else {
-        _searchRestaurantBloc.add(const GetSearchHistory());
+        getHistory();
         setState(() {
           _iskey = false;
         });
       }
     });
     super.initState();
+  }
+
+
+  void getHistory() {
+    final auth = context.read<AuthModel>();
+    if(auth.user == null) {
+      _searchRestaurantBloc.add(const GetLocalSearchHistory());
+    } else {
+      _searchRestaurantBloc.add(const GetSearchHistory());
+    }
+
+
+  }
+
+  void _deleteHistory(RestaurantSearchHistory history) async {
+    final auth = context.read<AuthModel>();
+    if(auth.user == null) {
+      _searchRestaurantBloc.add(DelLocalSearchHistory(history));
+    } else {
+      _searchRestaurantBloc.add(DelSearchHistory(history.restaurantUniqueId));
+    }
   }
 
   @override
@@ -155,6 +179,7 @@ class _FooderSearchScreenState extends State<FooderSearchScreen> {
             ),
              GestureDetector(
                onTap: () {
+                 _deleteHistory(history);
                    print('del');
                },
                child: const Center(child: Icon(Icons.close_rounded))
@@ -204,11 +229,37 @@ class _FooderSearchScreenState extends State<FooderSearchScreen> {
 
   Widget liveSearchCard(SearchRestaurant restaurant) {
     return  InkWell(
-      onTap: () {
-        _searchRestaurantRepo.addSearchHistory(
-          title: restaurant.restaurantName,
-          restaurantUniqueId: restaurant.uniqueId,
-        );
+      onTap: () async {
+        final auth = context.read<AuthModel>();
+        if(auth.user != null) {
+          _searchRestaurantRepo.addSearchHistory(
+            title: restaurant.restaurantName,
+            restaurantUniqueId: restaurant.uniqueId,
+          );
+        } else {
+          final rawHistoryList = await StorageService().getByKey('history_list') ?? '';
+          final historyList = rawHistoryList == '' ? '' : jsonDecode(rawHistoryList);
+          if(historyList.isEmpty) {
+            final List<RestaurantSearchHistory> newHistoryList = [];
+            newHistoryList.add(RestaurantSearchHistory(
+                historyName: restaurant.restaurantName,
+                restaurantUniqueId: restaurant.uniqueId)
+            );
+            final String historyListEncode = jsonEncode(newHistoryList);
+            await StorageService().setStr('history_list', historyListEncode);
+          } else {
+            final newHistoryList = (historyList as List).map((e) => RestaurantSearchHistory.fromJson(e)).toList();
+            final ifExist = newHistoryList.where((history) => history.restaurantUniqueId == restaurant.uniqueId).toList();
+            if(ifExist.isEmpty) {
+              newHistoryList.add(RestaurantSearchHistory(
+                  historyName: restaurant.restaurantName,
+                  restaurantUniqueId: restaurant.uniqueId));
+              final String historyListEncode = jsonEncode(newHistoryList);
+              await StorageService().setStr('history_list', historyListEncode);
+            }
+          }
+
+        }
         Navigator.of(context).pushNamed('/restaurant-info', arguments: {
           'uniqueId': restaurant.uniqueId,
         });

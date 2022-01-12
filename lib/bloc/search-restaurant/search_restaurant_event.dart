@@ -15,5 +15,18 @@ class SearchResturantByKeyword extends SearchRestaurantEvent {
 
 class GetSearchHistory extends SearchRestaurantEvent {
   const GetSearchHistory();
+}
 
+class GetLocalSearchHistory extends SearchRestaurantEvent {
+  const GetLocalSearchHistory();
+}
+
+class DelLocalSearchHistory extends SearchRestaurantEvent {
+  const DelLocalSearchHistory(this.history);
+  final RestaurantSearchHistory history;
+}
+
+class DelSearchHistory extends SearchRestaurantEvent {
+  const DelSearchHistory(this.restaurantUniqueId);
+  final String restaurantUniqueId;
 }

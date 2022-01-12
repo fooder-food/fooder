@@ -52,6 +52,7 @@ class FooderProfileScreen extends StatelessWidget {
             ),
           ),
           ...profileSelectionList.map((selection) => _profileSelectTab(context, selection)),
+          logoutTab(context),
         ],
       ),
     );
@@ -76,6 +77,41 @@ class FooderProfileScreen extends StatelessWidget {
                 Expanded(
                   child: Text(
                     selection["name"].toString(),
+                    style: textTheme.subtitle1!.copyWith(
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ),
+                const Icon(Icons.arrow_forward_ios_rounded, size: 20,)
+              ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            const Divider(color: Colors.grey,),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget logoutTab(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+   return GestureDetector(
+      onTap: () {
+        context.read<AuthModel>().logoutUser();
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 25),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Text(
+                   "Log Out",
                     style: textTheme.subtitle1!.copyWith(
                       fontWeight: FontWeight.normal,
                     ),

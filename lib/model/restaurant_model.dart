@@ -12,6 +12,7 @@ class Restaurant {
     required this.comments,
     required this.follower,
     required this.rating,
+    required this.image,
     this.distance,
   });
 
@@ -26,4 +27,6 @@ class Restaurant {
   final String follower;
   final double rating;
   final double? distance;
+  final String image;
+
 }
