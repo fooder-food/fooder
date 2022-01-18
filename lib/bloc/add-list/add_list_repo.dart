@@ -20,6 +20,12 @@ class AddListRepo {
   required String description,
   }) async => _addListApiProvider.addList(title: title, description: description);
 
+  Future<CollectionListInfo> updateList({
+    required String uniqueId,
+    required String title,
+    required String description,
+  }) async => _addListApiProvider.updateList(uniqueId: uniqueId, title: title, description: description);
+
   Future<List<CollectionList>> fetchList() async => _addListApiProvider.fetchList();
 
   Future<CollectionListInfo> fetchInfo({ required String uniqueId }) async => _addListApiProvider.fetchListInfo(uniqueId: uniqueId);

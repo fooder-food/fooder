@@ -16,6 +16,7 @@ class AddListBloc extends Bloc<AddListEvent, AddListState> {
   AddListBloc() : super(AddListState()) {
     on<FetchList>(_fetchList);
     on<AddSingleList>(_addNewList);
+    on<UpdateList>(_updateList);
     on<FetchListInfo>(_fetchListInfo);
     on<ReOrderListItem>(_reOrderListItem);
     on<DeleteListItem>(_delListItem);
@@ -66,6 +67,25 @@ class AddListBloc extends Bloc<AddListEvent, AddListState> {
 
     } catch(e) {
       emit(state.copyWith(status: CollectionListStatus.loadFailed));
+    }
+  }
+
+  void _updateList(
+      UpdateList event,
+      Emitter<AddListState> emit
+      ) async {
+    final oldInfo = state.info!;
+    try {
+      emit(state.copyWith(status: CollectionListStatus.onUpdate, info: null));
+      final info = await _addListRepo.updateList(
+        title: event.title,
+        description: event.description,
+        uniqueId: event.uniqueId,
+      );
+      emit(state.copyWith(status: CollectionListStatus.updateSuccess, info: info));
+
+    } catch(e) {
+      emit(state.copyWith(status: CollectionListStatus.updateFailed, info: oldInfo));
     }
   }
 

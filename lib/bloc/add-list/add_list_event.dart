@@ -21,6 +21,17 @@ class AddSingleList extends AddListEvent {
   final String description;
 }
 
+class UpdateList extends AddListEvent {
+  const UpdateList({
+    required this.uniqueId,
+    required this.title,
+    required this.description
+  });
+  final String uniqueId;
+  final String title;
+  final String description;
+}
+
 class FetchListInfo extends AddListEvent {
   const FetchListInfo({
     required this.uniqueId,

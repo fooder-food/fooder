@@ -30,6 +30,28 @@ class AddListApiProvider {
     }
   }
 
+  Future<CollectionListInfo> updateList({
+    required String uniqueId,
+    required String title,
+    required String description,
+}) async {
+    try {
+      final body = {
+        "uniqueId": uniqueId,
+        "title": title,
+        "description": description,
+      };
+
+      final response = await _networkService.put('list/update', data: body);
+      final data = response.data!["data"];
+      final CollectionListInfo info = CollectionListInfo.fromJson(data as Map<String, dynamic>);
+      return info;
+    } catch(e) {
+      debugPrint("err cat: ${e.toString()}");
+      throw Exception(e);
+    }
+  }
+
   Future<List<CollectionList>> fetchList() async {
     try {
       final response = await _networkService.get('list/all');

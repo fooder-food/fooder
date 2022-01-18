@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_notification/bloc/add-list/add_list_bloc.dart';
+import 'package:flutter_notification/model/collection_list_info_model.dart';
 import 'package:flutter_notification/model/collection_list_item_model.dart';
 import 'package:flutter_notification/model/providers/user_model.dart';
 import 'package:flutter_notification/model/user_model.dart';
@@ -79,7 +80,7 @@ class _FooderListInfoScreenState extends State<FooderListInfoScreen> {
                       ),
                     ],
                   ),
-                  userInfo(),
+                  userInfo(state.info!),
                   const SizedBox(
                     height: 20,
                   ),
@@ -115,7 +116,7 @@ class _FooderListInfoScreenState extends State<FooderListInfoScreen> {
     );
   }
 
-  Widget userInfo() {
+  Widget userInfo(CollectionListInfo info) {
     return Consumer<AuthModel>(
       builder: (_, authModel, __) {
         return Row(
@@ -146,6 +147,12 @@ class _FooderListInfoScreenState extends State<FooderListInfoScreen> {
                         ),
                         title: Text('Edit information', style: textTheme.subtitle1,),
                         onPressed: () {
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pushNamed('/add-list', arguments: {
+                            "title": info.title,
+                            "description": info.description,
+                            "uniqueId": info.uniqueId,
+                          });
 
                         }
                     ),
@@ -156,6 +163,7 @@ class _FooderListInfoScreenState extends State<FooderListInfoScreen> {
                         ),
                         title: Text('Edit List', style: textTheme.subtitle1,),
                         onPressed: () {
+                          Navigator.of(context).pop();
                           Navigator.of(context).pushNamed('/edit-list');
                         }
                     ),
@@ -166,7 +174,7 @@ class _FooderListInfoScreenState extends State<FooderListInfoScreen> {
                         ),
                         title: Text('Delete', style: textTheme.subtitle1,),
                         onPressed: () {
-
+                          Navigator.of(context).pop();
                         }
                     ),
                   ],
