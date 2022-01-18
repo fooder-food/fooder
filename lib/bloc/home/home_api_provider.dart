@@ -22,8 +22,8 @@ class HomeApiProvider {
     String url ='restaurants/all';
     if(latitude != null && longitude != null && radius != null) {
       print(sort);
-      url = url + '?radius=${radius}&longitude=${longitude}&latitude=${latitude}&sort=$sort';
-      //url = url + '?radius=${radius}&longitude=103.6715&latitude=1.5177&sort=$sort';
+      //  url = url + '?radius=${radius}&longitude=${longitude}&latitude=${latitude}&sort=$sort';
+      url = url + '?radius=${radius}&longitude=103.6715&latitude=1.5177&sort=$sort';
     } else {
       url = url + '?sort=$sort&state=$state';
     }

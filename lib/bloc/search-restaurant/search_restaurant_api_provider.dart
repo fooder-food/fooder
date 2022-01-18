@@ -45,7 +45,7 @@ class SearchRestaurantApiProvider {
   }) async {
     try {
       final body = {
-        "isActive": 1,
+        "isActive": 0,
         "restaurantUniqueId": uniqueId,
       };
       final response = await _networkService.put('history/update', data: body);

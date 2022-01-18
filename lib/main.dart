@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_notification/bloc/add-list/add_list_bloc.dart';
 import 'package:flutter_notification/bloc/add-restaurant/add_restaurant_bloc.dart';
 import 'package:flutter_notification/bloc/add-restaurant/add_restaurant_repo.dart';
 import 'package:flutter_notification/bloc/auth/auth_bloc.dart';
@@ -46,6 +47,7 @@ void main() async{
             BlocProvider<RestaurantDetailsBloc>(create: (_) =>RestaurantDetailsBloc()),
             BlocProvider<SearchPlaceBloc>(create: (_) =>SearchPlaceBloc()),
             BlocProvider<SearchRestaurantBloc>(create: (_) =>SearchRestaurantBloc()),
+            BlocProvider<AddListBloc>(create: (_) =>AddListBloc()),
           ],
           child: MultiProvider(
             providers: [

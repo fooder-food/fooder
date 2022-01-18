@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_notification/model/find_place_country_model.dart';
 
 class Utils {
-  static String getImgPath(String name, {String format: 'png'}) {
+  static String getImgPath(String name, {String format = 'png'}) {
     return 'assets/images/$name.$format';
   }
 

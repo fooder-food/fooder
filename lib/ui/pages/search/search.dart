@@ -180,7 +180,6 @@ class _FooderSearchScreenState extends State<FooderSearchScreen> {
              GestureDetector(
                onTap: () {
                  _deleteHistory(history);
-                   print('del');
                },
                child: const Center(child: Icon(Icons.close_rounded))
              ),
@@ -286,7 +285,6 @@ class _FooderSearchScreenState extends State<FooderSearchScreen> {
             ),
             GestureDetector(
                 onTap: () {
-                  print('del');
                 },
                 child: Center(child: Icon(Icons.north_east,size: 24,  color: Theme.of(context).secondaryHeaderColor))
             ),

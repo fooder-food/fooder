@@ -133,6 +133,7 @@ class SearchRestaurantBloc extends Bloc<SearchRestaurantEvent, SearchRestaurantS
         status: SearchRestaurantStatus.onGetHistory,
       ));
       List<RestaurantSearchHistory> newHistoryList = await _searchRestaurantRepo.delSearchHistory(uniqueId: event.restaurantUniqueId);
+      print(newHistoryList);
       emit(state.copyWith(
         status: SearchRestaurantStatus.getHistorySuccess,
         historyList: newHistoryList,
