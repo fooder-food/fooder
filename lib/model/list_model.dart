@@ -8,6 +8,7 @@ class CollectionList {
     required this.uniqueId,
     required this.title,
     required this.description,
+    required this.image
   });
 
   factory CollectionList.fromJson(Map<String, dynamic> json) => _$CollectionListFromJson(json);
@@ -16,4 +17,5 @@ class CollectionList {
   final String uniqueId;
   final String title;
   final String description;
+  final String image;
 }

@@ -9,6 +9,7 @@ import 'package:flutter_notification/ui/shared/widget/custom_button.dart';
 import 'package:provider/provider.dart';
 
 class FooderMyListScreen extends StatefulWidget {
+  static const routeName = '/list';
   const FooderMyListScreen({Key? key}) : super(key: key);
 
   @override
@@ -18,11 +19,20 @@ class FooderMyListScreen extends StatefulWidget {
 class _FooderMyListScreenState extends State<FooderMyListScreen> {
 
   late AddListBloc _addListBloc;
+  String uniqueId = '';
+  String itemUnique = '';
   @override
   void initState() {
     _addListBloc = BlocProvider.of<AddListBloc>(context);
+    Future.delayed(Duration.zero, setting);
     super.initState();
   }
+
+  void setting() {
+    final arg = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    uniqueId = arg["uniqueId"];
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -59,9 +69,45 @@ class _FooderMyListScreenState extends State<FooderMyListScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(3),
                     child: BlocConsumer<AddListBloc, AddListState>(
-                      listener: (context, state) {},
+                      listener: (context, state) {
+                        // if(state.status == CollectionListStatus.createItemSuccess) {
+                        //   Navigator.of(context).pushNamed('/list-info', arguments: {
+                        //     "uniqueId": itemUnique,
+                        //   });
+                        // }
+                      },
                       builder: (context, state) {
-                        if(state.status == CollectionListStatus.loadSuccess) {
+                        if(
+                           state.status == CollectionListStatus.loadSuccess
+                        || state.status == CollectionListStatus.createItemSuccess
+                        || state.status == CollectionListStatus.onCreateItem
+                        ) {
+                          if(state.list.isEmpty) {
+                            return Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'No MyList are added yet.',
+                                    style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                      'Make your own restaurant list.',
+                                    style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 16,
+                                    ),
+                                  )
+                                ],
+                              )
+                            );
+                          }
                           return CustomScrollView(
                             slivers: [
                               for(var index = 0; index < state.list.length; index++)
@@ -76,7 +122,9 @@ class _FooderMyListScreenState extends State<FooderMyListScreen> {
                             child: CircularProgressIndicator(),
                           );
                         }
-                        return Container();
+                        return Container(
+                          child: Text(state.status.toString()),
+                        );
                       },
                     )
                   ),
@@ -123,9 +171,23 @@ class _FooderMyListScreenState extends State<FooderMyListScreen> {
   Widget ListCard(CollectionList item) {
     return InkWell(
       onTap: () {
-        Navigator.of(context).pushNamed('/list-info', arguments: {
-          "uniqueId": item.uniqueId,
-        });
+        if(uniqueId.isNotEmpty) {
+          itemUnique = item.uniqueId;
+          _addListBloc.add(
+            CreateListItem(
+              restaurantUniqueId: uniqueId,
+              collectionUniqueId: item.uniqueId,
+            )
+          );
+          Navigator.of(context).pushNamed('/list-info', arguments: {
+            "uniqueId": item.uniqueId,
+          });
+          return;
+        } else {
+          Navigator.of(context).pushNamed('/list-info', arguments: {
+            "uniqueId": item.uniqueId,
+          });
+        }
       },
       child: Container(
         margin: const EdgeInsets.all(10),
@@ -166,8 +228,15 @@ class _FooderMyListScreenState extends State<FooderMyListScreen> {
                 ),
               ),
             ),
-            CachedNetworkImage(
-              imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png",
+            item.image.isEmpty
+           ? Container(
+                // decoration: BoxDecoration(
+                //   color: Theme.of(context).secondaryHeaderColor!.withOpacity(0.5),
+                // ),
+                // height: 100,
+            )
+           : CachedNetworkImage(
+              imageUrl: item.image,
               imageBuilder: (context, imageProvider) => Container(
                 height: 100,
                 decoration: BoxDecoration(
@@ -176,9 +245,18 @@ class _FooderMyListScreenState extends State<FooderMyListScreen> {
                     fit: BoxFit.cover,
                 ),
               )),
-              placeholder: (context, url) => const CircularProgressIndicator(),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
+              placeholder: (context, url) => Container(
+                  height: 100,
+                  child: const CircularProgressIndicator()
+              ),
+              errorWidget: (context, url, error) => Container(
+                height: 100,
+                child: const Center(
+                  child: Icon(Icons.error, size: 30,),
+                ),
+              ),
             ),
+            const Divider(),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
               child: Row(

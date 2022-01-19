@@ -11,6 +11,7 @@ CollectionList _$CollectionListFromJson(Map<String, dynamic> json) =>
       uniqueId: json['uniqueId'] as String,
       title: json['title'] as String,
       description: json['description'] as String,
+      image: json['image'] as String,
     );
 
 Map<String, dynamic> _$CollectionListToJson(CollectionList instance) =>
@@ -18,4 +19,5 @@ Map<String, dynamic> _$CollectionListToJson(CollectionList instance) =>
       'uniqueId': instance.uniqueId,
       'title': instance.title,
       'description': instance.description,
+      'image': instance.image,
     };

@@ -2,12 +2,18 @@ part of 'add_list_bloc.dart';
 
 enum CollectionListStatus {
   initial,
+  onDelete,
   onLoad,
+  deleteListSuccess,
+  deleteSuccess,
   loadSuccess,
   onUpdate,
   updateSuccess,
   updateFailed,
   loadFailed,
+  onCreateItem,
+  createItemSuccess,
+  createItemFailed,
   onFetchInfo,
   fetchInfoSuccess,
   fetchInfoFailed,
@@ -17,6 +23,11 @@ enum CollectionListStatus {
   onDelRestaurantToList,
   delFromListSuccess,
   searchSuccess,
+  onReorder,
+  reorderSuccess,
+  onDeleteItem,
+  deleteItemSuccess,
+  reorderFailed,
   searchFailed
 }
 

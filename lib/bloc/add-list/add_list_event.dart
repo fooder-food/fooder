@@ -32,6 +32,20 @@ class UpdateList extends AddListEvent {
   final String description;
 }
 
+class DelList extends AddListEvent {
+  const DelList(this.listUniqueId);
+  final String listUniqueId;
+}
+
+class CreateListItem extends AddListEvent {
+  const CreateListItem({
+    required this.restaurantUniqueId,
+    required this.collectionUniqueId,
+  });
+  final String restaurantUniqueId;
+  final String collectionUniqueId;
+}
+
 class FetchListInfo extends AddListEvent {
   const FetchListInfo({
     required this.uniqueId,
@@ -48,9 +62,18 @@ class ReOrderListItem extends AddListEvent {
   final int newIndex;
 }
 
+class ReOrderConfirm extends AddListEvent {
+  const ReOrderConfirm(this.listUnique);
+  final String listUnique;
+}
+
 class DeleteListItem extends AddListEvent {
-  const DeleteListItem(this.index);
-  final int index;
+  const DeleteListItem({
+    required this.itemUniqueId,
+    required this.listUniqueId
+  });
+  final String itemUniqueId;
+  final String listUniqueId;
 }
 
 class SearchRestaurantByKeyword extends AddListEvent {

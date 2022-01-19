@@ -17,8 +17,11 @@ class AddListBloc extends Bloc<AddListEvent, AddListState> {
     on<FetchList>(_fetchList);
     on<AddSingleList>(_addNewList);
     on<UpdateList>(_updateList);
+    on<DelList>(_delList);
+    on<CreateListItem>(_createListItem);
     on<FetchListInfo>(_fetchListInfo);
     on<ReOrderListItem>(_reOrderListItem);
+    on<ReOrderConfirm>(_reoderListItemConfirm);
     on<DeleteListItem>(_delListItem);
     on<SearchRestaurantByKeyword>(_searchRestaurant);
     on<AddRestaurantBySearch>(_addRestaurantBySearch);
@@ -37,6 +40,23 @@ class AddListBloc extends Bloc<AddListEvent, AddListState> {
 
     } catch(e) {
       emit(state.copyWith(status: CollectionListStatus.loadFailed));
+    }
+  }
+
+  void _createListItem(
+      CreateListItem event,
+      Emitter<AddListState> emit
+      ) async {
+    try {
+      emit(state.copyWith(status: CollectionListStatus.onCreateItem));
+      await _addListRepo.createListItem(
+          restaurantUniqueId: event.restaurantUniqueId,
+          collectionUniqueId: event.collectionUniqueId
+      );
+      emit(state.copyWith(status: CollectionListStatus.createItemSuccess,));
+
+    } catch(e) {
+      emit(state.copyWith(status: CollectionListStatus.createItemFailed));
     }
   }
 
@@ -89,6 +109,21 @@ class AddListBloc extends Bloc<AddListEvent, AddListState> {
     }
   }
 
+  void _delList(
+      DelList event,
+      Emitter<AddListState> emit
+      ) async {
+    try {
+      emit(state.copyWith(status: CollectionListStatus.onDelete));
+      final list = await _addListRepo.deleteList(listUniqueId: event.listUniqueId);
+      emit(state.copyWith(status: CollectionListStatus.deleteListSuccess, list: list));
+
+    } catch(e) {
+      print('error $e');
+      emit(state.copyWith(status: CollectionListStatus.loadFailed));
+    }
+  }
+
   void _reOrderListItem(
       ReOrderListItem event,
       Emitter<AddListState> emit
@@ -110,22 +145,44 @@ class AddListBloc extends Bloc<AddListEvent, AddListState> {
     emit(state.copyWith(status: CollectionListStatus.loadSuccess,));
   }
 
+  void _reoderListItemConfirm(
+      ReOrderConfirm event,
+      Emitter<AddListState> emit
+      ) async {
+    try {
+      emit(state.copyWith(
+        status: CollectionListStatus.onReorder,
+      ));
+      final CollectionListInfo info = await _addListRepo.reorderItem(
+          listUniqueId: event.listUnique,
+          newOrderList: state.info!.items
+      );
+      emit(state.copyWith(
+        status: CollectionListStatus.reorderSuccess,
+        info: info,
+      ));
+    } catch(e) {
+      emit(state.copyWith(
+        status: CollectionListStatus.reorderFailed,
+      ));
+    }
+  }
+
   void _delListItem(
       DeleteListItem event,
       Emitter<AddListState> emit
-      ) {
-    emit(state.copyWith(status: CollectionListStatus.onLoad));
-    final newInfo = state.info!;
-    newInfo.items.removeAt(event.index);
-    for (var index = 0; index < newInfo.items.length; index++) {
-      final order = index + 1;
-      final item = newInfo.items[index];
-      if(item.order != order) {
-        newInfo.items[index].order = order;
-      }
+      ) async {
+    try {
+      emit(state.copyWith(status: CollectionListStatus.onLoad));
+      final CollectionListInfo info = await _addListRepo.deleteItem(
+          listUniqueId: event.listUniqueId,
+          itemUniqueId: event.itemUniqueId
+      );
 
+      emit(state.copyWith(status: CollectionListStatus.loadSuccess, info: info));
+    } catch(e) {
+      emit(state.copyWith(status: CollectionListStatus.loadFailed,));
     }
-    emit(state.copyWith(status: CollectionListStatus.loadSuccess, info: newInfo));
   }
 
 

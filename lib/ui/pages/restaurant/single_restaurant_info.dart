@@ -127,6 +127,9 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
 
   void _addList() {
     _ifIsGuest();
+    Navigator.of(context).pushNamed('/list', arguments: {
+      "uniqueId": restaurantUniqueId,
+    });
   }
 
   void _toGoogleMap(Geo geo) async {

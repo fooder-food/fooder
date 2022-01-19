@@ -21,6 +21,7 @@ class _FooderAddListScreenState extends State<FooderAddListScreen> {
   final TextEditingController _titleTextEditingController = TextEditingController();
   final TextEditingController _descriptionTextEditingController = TextEditingController();
   String _navTitle = 'New My List';
+  String _buttonTitle = 'Done';
   String _updateUniqueId = '';
   @override
   void initState() {
@@ -38,6 +39,7 @@ class _FooderAddListScreenState extends State<FooderAddListScreen> {
       _descriptionTextEditingController.text = description;
       setState(() {
         _navTitle = 'Edit Information';
+        _buttonTitle = 'Update';
         _updateUniqueId = arg["uniqueId"];
       });
     }
@@ -82,7 +84,7 @@ class _FooderAddListScreenState extends State<FooderAddListScreen> {
                 }
               },
               builder: (context, state) {
-                return  FooderCustomButton(isBorder: false, buttonContent: 'Done', onTap: () {
+                return  FooderCustomButton(isBorder: false, buttonContent: _buttonTitle, onTap: () {
                   if(_updateUniqueId.isNotEmpty) {
                     _addListBloc.add(UpdateList(
                         uniqueId: _updateUniqueId,

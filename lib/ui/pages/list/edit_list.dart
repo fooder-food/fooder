@@ -35,7 +35,7 @@ class _FooderEditListScreenState extends State<FooderEditListScreen> {
           actions: [
             IconButton(
                 onPressed: () async {
-                  Navigator.of(context).pop();
+                  _addListBloc.add(ReOrderConfirm(_addListBloc.state.info!.uniqueId));
                 },
                 icon: Icon(
                   Icons.check_rounded,
@@ -45,7 +45,12 @@ class _FooderEditListScreenState extends State<FooderEditListScreen> {
           ]
         ),
         body: BlocConsumer<AddListBloc, AddListState>(
-          listener: (context, state) {},
+          listener: (context, state) {
+            if(state.status == CollectionListStatus.reorderSuccess) {
+              _addListBloc.add(FetchListInfo(uniqueId: _addListBloc.state.info!.uniqueId));
+              Navigator.of(context).pop();
+            }
+          },
           builder: (context, state) {
             return ReorderableListView.builder(
               itemCount: state.info!.items.length,
@@ -66,7 +71,10 @@ class _FooderEditListScreenState extends State<FooderEditListScreen> {
                                 actions: [
                                   TextButton(
                                     onPressed: () {
-                                      _addListBloc.add(DeleteListItem(index));
+                                      _addListBloc.add(DeleteListItem(
+                                        itemUniqueId: state.info!.items[index].uniqueId,
+                                        listUniqueId: state.info!.uniqueId,
+                                      ));
                                       Navigator.of(context).pop(true);
                                     },
                                     child: const Text('Yes'),

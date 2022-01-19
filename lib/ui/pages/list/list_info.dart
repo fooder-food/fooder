@@ -53,18 +53,31 @@ class _FooderListInfoScreenState extends State<FooderListInfoScreen> {
     final appbarTheme = Theme.of(context).appBarTheme;
     return Scaffold(
       appBar: screenAppBar(appbarTheme, appTitle: '', onPopCallback: () {
-        Navigator.of(context).pop();
-        _addListBloc.add(const FetchList());
+        if(_addListBloc.state.status != CollectionListStatus.deleteListSuccess) {
+          _addListBloc.add(const FetchList());
+          Navigator.of(context).pop();
+        }
       }),
       body: Padding(
         padding: const EdgeInsets.all(15),
         child: BlocConsumer<AddListBloc, AddListState>(
-          listener: (context, state) {},
+          listener: (context, state) {
+            if(state.status == CollectionListStatus.deleteListSuccess) {
+              _addListBloc.add(const FetchList());
+              Navigator.of(context).pop();
+            }
+          },
           builder: (context, state) {
             if(state.status == CollectionListStatus.onFetchInfo) {
               return const FooderLoadingWidget();
             }
-            if(state.info != null || state.status == CollectionListStatus.fetchInfoSuccess) {
+            if(state.status == CollectionListStatus.onDelete) {
+              return const FooderLoadingWidget();
+            }
+            if(
+                state.info != null
+                || state.status == CollectionListStatus.fetchInfoSuccess
+              ) {
               return ListView(
                 children: [
                   Row(
@@ -109,7 +122,8 @@ class _FooderListInfoScreenState extends State<FooderListInfoScreen> {
                 ],
               );
             }
-            return Container();
+            return Container(
+            );
           },
         ),
       ),
@@ -175,6 +189,28 @@ class _FooderListInfoScreenState extends State<FooderListInfoScreen> {
                         title: Text('Delete', style: textTheme.subtitle1,),
                         onPressed: () {
                           Navigator.of(context).pop();
+                          showDialog(
+                            context: context,
+                            builder: (context) =>  AlertDialog(
+                              content: const Text('Did you want delete your item?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    _addListBloc.add(DelList(uniqueId));
+                                    Navigator.of(context).pop(true);
+                                  },
+                                  child: const Text('Yes'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop(false);
+                                  },
+                                  child: const Text('No'),
+                                ),
+                              ],
+                            ),
+                          );
+
                         }
                     ),
                   ],
