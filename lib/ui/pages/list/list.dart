@@ -7,6 +7,7 @@ import 'package:flutter_notification/model/providers/navigator_model.dart';
 import 'package:flutter_notification/model/providers/user_model.dart';
 import 'package:flutter_notification/ui/shared/widget/custom_button.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class FooderMyListScreen extends StatefulWidget {
   static const routeName = '/list';
@@ -17,7 +18,7 @@ class FooderMyListScreen extends StatefulWidget {
 }
 
 class _FooderMyListScreenState extends State<FooderMyListScreen> {
-
+  final RefreshController _refreshController = RefreshController(initialRefresh: false);
   late AddListBloc _addListBloc;
   String uniqueId = '';
   String itemUnique = '';
@@ -30,7 +31,16 @@ class _FooderMyListScreenState extends State<FooderMyListScreen> {
 
   void setting() {
     final arg = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    uniqueId = arg["uniqueId"];
+    if(arg["uniqueId"] != null) {
+      uniqueId = arg["uniqueId"];
+    }
+  }
+
+  void _onRefresh() async{
+    // monitor network fetch
+    await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use refreshFailed()
+    _refreshController.refreshCompleted();
   }
 
   @override
@@ -238,7 +248,7 @@ class _FooderMyListScreenState extends State<FooderMyListScreen> {
            : CachedNetworkImage(
               imageUrl: item.image,
               imageBuilder: (context, imageProvider) => Container(
-                height: 100,
+                height: 120,
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     image: imageProvider,

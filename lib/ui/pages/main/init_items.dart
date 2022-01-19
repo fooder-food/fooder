@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_notification/ui/pages/favorite/favorite.dart';
 import 'package:flutter_notification/ui/pages/home/home.dart';
 import 'package:flutter_notification/ui/pages/list/list.dart';
 import 'package:flutter_notification/ui/pages/search/search.dart';
@@ -38,5 +39,5 @@ List<Widget> pages = [
   const FooderSearchScreen(),
   Container(),
   const FooderMyListScreen(),
-  const FooderSearchScreen(),
+  const FooderFavoriteScreen(),
 ];

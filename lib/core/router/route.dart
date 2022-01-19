@@ -5,6 +5,7 @@ import 'package:flutter_notification/bloc/restaurant-location/restaurant_locatio
 import 'package:flutter_notification/ui/pages/auth/email_login.dart';
 import 'package:flutter_notification/ui/pages/auth/email_register.dart';
 import 'package:flutter_notification/ui/pages/auth/login.dart';
+import 'package:flutter_notification/ui/pages/favorite/favorite.dart';
 import 'package:flutter_notification/ui/pages/list/add_list.dart';
 import 'package:flutter_notification/ui/pages/list/add_restaurant.dart';
 import 'package:flutter_notification/ui/pages/list/edit_list.dart';
@@ -62,6 +63,7 @@ class FooderRoute {
     FooderAddListRestaurantScreen.routeName: (ctx) => const FooderAddListRestaurantScreen(),
     FooderEditListScreen.routeName: (ctx) => const FooderEditListScreen(),
     FooderMyListScreen.routeName: (ctx) => const FooderMyListScreen(),
+    FooderFavoriteScreen.routeName: (ctx) => const FooderFavoriteScreen(),
   };
 
   //route factory
