@@ -111,6 +111,7 @@ class _FooderRestaurantCardState extends State<FooderRestaurantCard> {
                             ],
                           )
                         ),
+                        const SizedBox(width: 10,),
                         Text(widget.state.restaurants[widget.index].rating.toString(), style: textTheme.headline2,),
                       ],
                     ),

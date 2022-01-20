@@ -9,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_notification/bloc/add-restaurant/add_restaurant_bloc.dart';
 import 'package:flutter_notification/bloc/home/home_bloc.dart';
 import 'package:flutter_notification/core/service/geo/geo_location.dart';
+import 'package:flutter_notification/core/service/storage/storage_service.dart';
 import 'package:flutter_notification/model/providers/select_place.dart';
 import 'package:flutter_notification/model/providers/user_model.dart';
 import 'package:flutter_notification/model/providers/user_search_radius.dart';
@@ -81,21 +82,43 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
   Future<void> initRestaurant() async {
 
     try {
-      final position = await _geoLocationService.determinePosition(context);
-      if(_geoLocationService.getServiceEnabled && _geoLocationService.getPermissionIsAlways) {
+      final String? _firstView = await StorageService().getByKey('first_view');
+      print(_firstView);
+      if(_firstView != null) {
+        final locationFirst = context.read<SelectPlaceModel>().locationFirst;
         final userSearchModel = context.read<UserSearchRadiusModel>();
-        homeBloc.add(FetchAllRestaurant(
-          sort: userSearchModel.selectedSorting,
-          radius: userSearchModel.distance,
-          latitude: position.latitude,
-          longitude: position.longitude,
-          filter: userSearchModel.selectedCategoryIdList,
-        ));
-        setState(() {
-          hasLocation = true;
-        });
-        return;
+        if(locationFirst) {
+
+          final position = await _geoLocationService.determinePosition(context);
+          if(_geoLocationService.getServiceEnabled && _geoLocationService.getPermissionIsAlways) {
+
+            homeBloc.add(FetchAllRestaurant(
+              sort: userSearchModel.selectedSorting,
+              radius: userSearchModel.distance,
+              latitude: position.latitude,
+              longitude: position.longitude,
+              filter: userSearchModel.selectedCategoryIdList,
+            ));
+            setState(() {
+              hasLocation = true;
+            });
+            return;
+          }
+        } else {
+          final selectedPlace = context.read<SelectPlaceModel>().selectedPlace;
+          if(selectedPlace != null) {
+            homeBloc.add(FetchAllRestaurant(
+              sort: userSearchModel.selectedSorting,
+              radius: userSearchModel.distance,
+              state: selectedPlace.name,
+              filter: userSearchModel.selectedCategoryIdList,
+            ));
+          }
+
+        }
+
       }
+
     } catch(e) {
       if(!_geoLocationService.getServiceEnabled || !_geoLocationService.getPermissionIsAlways) {
         context.read<UserSearchRadiusModel>().updateSelectedSortingInit();
@@ -338,7 +361,7 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
             SmartRefresher(
               controller: _refreshController,
               enablePullDown: true,
-              enablePullUp: true,
+              enablePullUp: false,
               child: CustomScrollView(
                 controller: _scrollController,
                 slivers: [

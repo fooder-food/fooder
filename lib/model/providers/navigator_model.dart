@@ -7,6 +7,7 @@ class NavigatorModel extends ChangeNotifier {
   int get index => _index;
   void updateIndex(int newIndex) {
     _index = newIndex;
+    print('final value is $_index');
     notifyListeners();
   }
 

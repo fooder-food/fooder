@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_notification/bloc/auth/auth_bloc.dart';
+import 'package:flutter_notification/model/providers/navigator_model.dart';
 import 'package:sign_button/constants.dart';
 import 'package:sign_button/sign_button.dart';
 
@@ -41,10 +42,8 @@ class _FooderLoginSelectScreenState extends State<FooderLoginSelectScreen> {
             child: TextButton(
               onPressed: () {
                 Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false,
-                  arguments: {
-                    "index": 1,
-                  }
                 );
+                context.read<NavigatorModel>().resetIndex();
               },
               child: Text(
                 "SKIP",

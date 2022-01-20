@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:country_list_pick/country_list_pick.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_notification/bloc/home/home_bloc.dart';
 import 'package:flutter_notification/bloc/search_place/search_place_bloc.dart';
+import 'package:flutter_notification/core/service/storage/storage_service.dart';
 import 'package:flutter_notification/model/providers/select_place.dart';
 import 'package:flutter_notification/model/providers/user_search_radius.dart';
 
@@ -18,30 +21,43 @@ class FooderSelectPlaceScreen extends StatefulWidget {
 class _FooderSelectPlaceScreenState extends State<FooderSelectPlaceScreen> {
   late SearchPlaceBloc _seachPlaceBloc;
   late HomeBloc _homeBloc;
+  bool firstView = false;
+
 
   @override
   void initState() {
     super.initState();
+    initFirstView();
     _seachPlaceBloc = BlocProvider.of<SearchPlaceBloc>(context);
     _homeBloc = BlocProvider.of<HomeBloc>(context);
     _seachPlaceBloc.add(const FetchStateBasedOnCountry('MY'));
+
+  }
+
+  void initFirstView() async {
+    final String? _firstView = await StorageService().getByKey('first_view');
+    setState(() {
+      firstView = _firstView == null;
+    });
   }
 
   Widget header() {
-    return Container(
-      color: Colors.white,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          GestureDetector(
-            onTap: () {
-              Navigator.of(context).pop();
-            },
-            child: const Icon(Icons.close_rounded, size: 30,),
-          ),
-        ],
-      )
-    );
+    return firstView
+        ? Container()
+        :Container(
+          color: Colors.white,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Icon(Icons.close_rounded, size: 30,),
+              ),
+            ],
+          )
+        );
   }
 
   @override
@@ -112,7 +128,7 @@ class _FooderSelectPlaceScreenState extends State<FooderSelectPlaceScreen> {
                   child: ListView.separated(
                       itemBuilder: (context, index) {
                         return ListTile(
-                          onTap: () {
+                          onTap: () async {
                             final userRadiusModel = context.read<UserSearchRadiusModel>();
                             final selectedPlaceModel = context.read<SelectPlaceModel>();
                             selectedPlaceModel.updateState(state.states[index]);
@@ -124,7 +140,18 @@ class _FooderSelectPlaceScreenState extends State<FooderSelectPlaceScreen> {
                               state: state.states[index].name,
                             )
                             );
-                            Navigator.of(context).pop();
+
+                            final String? _firstView = await StorageService().getByKey('first_view');
+                            if(_firstView == null) {
+                              final String firstViewEncode = jsonEncode(true);
+                              await StorageService().setStr('first_view', firstViewEncode);
+                              context.read<SelectPlaceModel>().updateLocationPriority(false);
+                              Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+
+                            } else {
+                              Navigator.of(context).pop();
+                            }
+
                           },
                           title: Text(state.states[index].name),
                         );

@@ -9,6 +9,7 @@ import 'package:flutter_notification/model/auth_model.dart';
 import 'package:flutter_notification/model/providers/navigator_model.dart';
 import 'package:flutter_notification/model/providers/user_model.dart';
 import 'package:flutter_notification/ui/pages/main/init_items.dart';
+import 'package:flutter_notification/ui/pages/splash/request_location.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -51,8 +52,9 @@ class _FooderMainScreenState extends State<FooderMainScreen> with AfterLayoutMix
         backgroundColor: Colors.white,
         currentIndex: context.watch<NavigatorModel>().index,
         onTap: (value) {
+
           if(value !=2) {
-           context.read<NavigatorModel>().updateIndex(value);
+            context.read<NavigatorModel>().updateIndex(value);
           }
         },
         type: BottomNavigationBarType.fixed,
@@ -73,6 +75,7 @@ class _FooderMainScreenState extends State<FooderMainScreen> with AfterLayoutMix
 
   @override
   void afterFirstLayout(BuildContext context) {
+    firstView();
     checkFirst();
   }
 
@@ -86,6 +89,13 @@ class _FooderMainScreenState extends State<FooderMainScreen> with AfterLayoutMix
       final Auth auth = Auth.fromJson(decoded);
       print('user token${auth.token}');
       context.read<AuthModel>().setUser(auth);
+    }
+  }
+
+  void firstView() async {
+    final String? _firstView = await StorageService().getByKey('first_view');
+    if(_firstView == null) {
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) => const FooderRequestLocationScreen()));
     }
   }
 

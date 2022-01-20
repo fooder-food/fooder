@@ -10,8 +10,8 @@ Widget fooderAvatar({
   if(user == null || user.avatar.isEmpty) {
     return ClipOval(
       child: SvgPicture.asset(
-        'assets/img/guest-avatar.svg',
-      ),
+        'assets/img/guest-avatar.svg'
+      )
     );
   } else {
     if (user.avatar.isNotEmpty) {

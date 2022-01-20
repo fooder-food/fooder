@@ -36,6 +36,7 @@ class _FooderFavoriteScreenState extends State<FooderFavoriteScreen> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+
     return SafeArea(
       child: Scaffold(
         body: Consumer<AuthModel>(
@@ -46,7 +47,6 @@ class _FooderFavoriteScreenState extends State<FooderFavoriteScreen> {
                     Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false)
                 );
               }
-              context.read<NavigatorModel>().resetIndex();
               return Container();
             }
             _favoriteBloc.add(const FetchFavorite());

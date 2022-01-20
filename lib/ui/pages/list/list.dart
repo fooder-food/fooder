@@ -55,7 +55,7 @@ class _FooderMyListScreenState extends State<FooderMyListScreen> {
                     Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false)
                 );
               }
-              context.read<NavigatorModel>().resetIndex();
+              //context.read<NavigatorModel>().resetIndex();
               return Container();
             }
             _addListBloc.add(const FetchList());

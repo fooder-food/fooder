@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_notification/core/service/storage/storage_service.dart';
 import 'package:geolocator/geolocator.dart';
 
 class GeoLocationService {
@@ -11,9 +12,15 @@ class GeoLocationService {
     init();
   }
 
+
   init() async {
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    permission = await Geolocator.checkPermission();
+    final String? _firstView = await StorageService().getByKey('first_view');
+    print(_firstView);
+    if(_firstView != null) {
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      permission = await Geolocator.checkPermission();
+    }
+
   }
 
   Future<Position> determinePosition(BuildContext context,) async {
