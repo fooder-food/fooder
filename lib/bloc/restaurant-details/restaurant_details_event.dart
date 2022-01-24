@@ -17,6 +17,11 @@ class FetchRestaurantInfo extends RestaurantDetailsEvent {
   final String? userUniqueId;
 }
 
+class SetCommentLike extends RestaurantDetailsEvent {
+  const SetCommentLike(this.commentUniqueId);
+  final String commentUniqueId;
+}
+
 class SetRestaurantFavorite extends RestaurantDetailsEvent {
   const SetRestaurantFavorite(this.favorite, {
     this.restaurantUniqueId = '',

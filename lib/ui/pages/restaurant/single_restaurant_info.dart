@@ -279,7 +279,9 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
       builder: (context, state) {
         if (
         state.status == RestaurantDetailStatus.loadRestaurantDataSuccess ||
-        state.status == RestaurantDetailStatus.onSetFavorite
+        state.status == RestaurantDetailStatus.onSetFavorite ||
+        state.status == RestaurantDetailStatus.onLike ||
+        state.status == RestaurantDetailStatus.likeSuccessful
         ) {
           return restaurantScaffold(state);
         }
@@ -657,6 +659,12 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
           _mapController.complete(controller);
         },
         onTap: (latLng) {
+          Navigator.of(context).pushNamed('/restaurant-info-map', arguments: {
+            "latitude": state.restaurant!.geo.lat,
+            "longitude": state.restaurant!.geo.lng,
+            "address": state.restaurant!.address,
+            "restaurantName": state.restaurant!.restaurantName,
+          });
           print('map');
         },
       ),
@@ -941,7 +949,7 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
                 ),
               ),
               Text(
-                '${state.restaurant!.pricePerson}/ 1 person',
+                'RM ${state.restaurant!.pricePerson}/ 1 person',
                 style: textTheme.subtitle1!.copyWith(
                   fontWeight: FontWeight.normal,
                 ),

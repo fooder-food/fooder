@@ -22,6 +22,24 @@ class RestaurantDetailsApiProvider {
     }
   }
 
+  Future<RestaurantDetails> setLike({
+   required String commentUniqueId
+  }) async {
+    try {
+      final body = {
+        "commentUniqueId": commentUniqueId,
+      };
+      final response = await _networkService.post('restaurants/comment/set-like', data: body);
+      final data = response.data!["data"];
+      final RestaurantDetails restaurant = RestaurantDetails.fromJson(data as Map<String, dynamic>);
+      return restaurant;
+
+    } catch(e) {
+      debugPrint("err cat: ${e.toString()}");
+      throw Exception(e);
+    }
+  }
+
   Future<void> addFavorite({
     required String userUniqueId,
     required String restaurantUniqueId,

@@ -125,6 +125,10 @@ class AddRestaurantBloc extends Bloc<AddRestaurantEvent, AddRestaurantState> {
         placeId: placeId,
         phoneNumber: phoneNumber,
         selectedCategoryId: selectedCategoryId);
+    state.image = null;
+    state.restaurantName = '';
+    state.placeDetails = null;
+    state.phoneNumber = '';
    emit(state.copyState(
      status: AddRestaurantFormStatus.addRestaurantSuccess,
    ));

@@ -3,6 +3,8 @@ import 'package:flutter_notification/model/geo_model.dart';
 import 'package:flutter_notification/model/restaurant_comment_photo_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import 'comment_like_user_model.dart';
+
 part 'restaurant_comment_model.g.dart';
 
 @JsonSerializable()
@@ -17,6 +19,7 @@ class RestaurantComment {
     required this.user,
     required this.likeTotal,
     required this.replyTotal,
+    required this.totalLikeUser,
   });
 
   factory RestaurantComment.fromJson(Map<String, dynamic> json) => _$RestaurantCommentFromJson(json);
@@ -28,6 +31,7 @@ class RestaurantComment {
   final DateTime createDate;
   final DateTime updateDate;
   final List<RestaurantCommentPhoto> photos;
+  final List<CommentLikeUser> totalLikeUser;
   final int likeTotal;
   final int replyTotal;
   final CommentUser user;

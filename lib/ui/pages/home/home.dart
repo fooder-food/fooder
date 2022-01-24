@@ -80,13 +80,12 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
   }
 
   Future<void> initRestaurant() async {
-
+    final locationFirst = context.read<SelectPlaceModel>().locationFirst;
+    final userSearchModel = context.read<UserSearchRadiusModel>();
     try {
       final String? _firstView = await StorageService().getByKey('first_view');
       print(_firstView);
       if(_firstView != null) {
-        final locationFirst = context.read<SelectPlaceModel>().locationFirst;
-        final userSearchModel = context.read<UserSearchRadiusModel>();
         if(locationFirst) {
 
           final position = await _geoLocationService.determinePosition(context);
@@ -106,6 +105,7 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
           }
         } else {
           final selectedPlace = context.read<SelectPlaceModel>().selectedPlace;
+          print(selectedPlace!.name);
           if(selectedPlace != null) {
             homeBloc.add(FetchAllRestaurant(
               sort: userSearchModel.selectedSorting,
@@ -117,6 +117,14 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
 
         }
 
+      } else {
+        final selectedPlace = context.read<SelectPlaceModel>().selectedPlace;
+        homeBloc.add(FetchAllRestaurant(
+          sort: userSearchModel.selectedSorting,
+          radius: userSearchModel.distance,
+          state: selectedPlace!.name,
+          filter: userSearchModel.selectedCategoryIdList,
+        ));
       }
 
     } catch(e) {
@@ -127,7 +135,8 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
         });
       }
     }
-    getRestaurant();
+    FocusScope.of(context).unfocus();
+    //getRestaurant();
   }
 
   void getRestaurant() {
@@ -322,6 +331,7 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
   void _getLocation() async {
     Navigator.of(context).pop();
     context.read<UserSearchRadiusModel>().updateSelectedSortingAsDistance();
+    context.read<SelectPlaceModel>().updateLocationPriority(true);
     initRestaurant();
   }
 

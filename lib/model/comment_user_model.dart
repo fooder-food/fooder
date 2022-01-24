@@ -1,4 +1,3 @@
-import 'package:flutter_notification/model/geo_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'comment_user_model.g.dart';

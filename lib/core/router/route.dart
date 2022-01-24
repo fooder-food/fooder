@@ -17,11 +17,13 @@ import 'package:flutter_notification/ui/pages/profile/profile.dart';
 import 'package:flutter_notification/ui/pages/report/report.dart';
 import 'package:flutter_notification/ui/pages/restaurant/add_restaurant.dart';
 import 'package:flutter_notification/ui/pages/restaurant/add_restaurant_map_info.dart';
+import 'package:flutter_notification/ui/pages/restaurant/restaurant_info_map.dart';
 import 'package:flutter_notification/ui/pages/restaurant/restaurant_locate.dart';
 import 'package:flutter_notification/ui/pages/restaurant/search_country.dart';
 import 'package:flutter_notification/ui/pages/restaurant/single_restaurant_info.dart';
 import 'package:flutter_notification/ui/pages/review/review.dart';
 import 'package:flutter_notification/ui/pages/review/review_image_picker.dart';
+import 'package:flutter_notification/ui/pages/review/single_review.dart';
 import 'package:flutter_notification/ui/pages/unknown/unknown.dart';
 
 class FooderRoute {
@@ -64,6 +66,8 @@ class FooderRoute {
     FooderEditListScreen.routeName: (ctx) => const FooderEditListScreen(),
     FooderMyListScreen.routeName: (ctx) => const FooderMyListScreen(),
     FooderFavoriteScreen.routeName: (ctx) => const FooderFavoriteScreen(),
+    FooderRestaurantInfoMap.routeName: (ctx) => const FooderRestaurantInfoMap(),
+    FooderSingleReviewScreen.routeName: (ctx) => const FooderSingleReviewScreen(),
   };
 
   //route factory

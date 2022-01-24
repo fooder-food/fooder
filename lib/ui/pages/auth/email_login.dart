@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_notification/bloc/auth/auth_bloc.dart';
+import 'package:flutter_notification/model/providers/navigator_model.dart';
 import 'package:flutter_notification/ui/shared/widget/custom_app_bar.dart';
 import 'package:flutter_notification/ui/shared/widget/custom_button.dart';
 import 'package:flutter_notification/ui/shared/widget/custom_text_form_field.dart';
@@ -50,18 +51,11 @@ class _FooderEmailLoginScreenState extends State<FooderEmailLoginScreen> {
       child: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) async {
           if(state is AuthenticatedState) {
-            showToast(
-                context: context,
-                msg: 'Login Successful'
-            );
+            showToast(msg: state.auth.message, context: context, backgroundColor: Colors.green, textColor: Colors.white);
             Navigator.of(context).pushNamed('/');
+            context.read<NavigatorModel>().resetIndex();
           } else if (state is UnAuthenticatedState) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.auth.message),
-                backgroundColor: Colors.red,
-              ),
-            );
+            showToast(msg: state.auth.message, context: context, backgroundColor: Colors.red, textColor: Colors.white);
           }
         },
         builder: (context, state) {

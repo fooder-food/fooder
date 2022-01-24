@@ -22,6 +22,9 @@ class RestaurantDetailsRepo {
   Future<RestaurantDetails> fetchRestaurantData({
     required String uniqueId,
   }) async => _restaurantDetailsApiProvider.fetchRestaurant(uniqueId: uniqueId);
+  Future<RestaurantDetails> setCommentLike({
+    required String commentUniqueId,
+  }) async => _restaurantDetailsApiProvider.setLike(commentUniqueId: commentUniqueId);
 
   Future<void> addFavorite({
     required String userUniqueId,

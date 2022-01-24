@@ -3,6 +3,9 @@ part of 'restaurant_details_bloc.dart';
 enum RestaurantDetailStatus{
   initial,
   onLoadRestaurantData,
+  onLike,
+  likeSuccessful,
+  likeFailed,
   loadRestaurantDataSuccess,
   loadFailed,
   onSetFavorite,

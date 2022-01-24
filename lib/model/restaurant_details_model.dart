@@ -9,7 +9,7 @@ part 'restaurant_details_model.g.dart';
 
 @JsonSerializable()
 class RestaurantDetails {
-  const RestaurantDetails({
+  RestaurantDetails({
     required this.restaurantName,
     required this.uniqueId,
     required this.state,
@@ -58,5 +58,5 @@ class RestaurantDetails {
   final List<RestaurantCommentPhoto> photos;
   final RestaurantCreateUser createUser;
   final List<RestaurantFollower> followers;
-  final List<RestaurantComment> comments;
+  List<RestaurantComment> comments;
 }

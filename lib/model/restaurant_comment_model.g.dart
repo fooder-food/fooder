@@ -20,6 +20,9 @@ RestaurantComment _$RestaurantCommentFromJson(Map<String, dynamic> json) =>
       user: CommentUser.fromJson(json['user'] as Map<String, dynamic>),
       likeTotal: json['likeTotal'] as int,
       replyTotal: json['replyTotal'] as int,
+      totalLikeUser: (json['totalLikeUser'] as List<dynamic>)
+          .map((e) => CommentLikeUser.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$RestaurantCommentToJson(RestaurantComment instance) =>
@@ -30,6 +33,7 @@ Map<String, dynamic> _$RestaurantCommentToJson(RestaurantComment instance) =>
       'createDate': instance.createDate.toIso8601String(),
       'updateDate': instance.updateDate.toIso8601String(),
       'photos': instance.photos,
+      'totalLikeUser': instance.totalLikeUser,
       'likeTotal': instance.likeTotal,
       'replyTotal': instance.replyTotal,
       'user': instance.user,

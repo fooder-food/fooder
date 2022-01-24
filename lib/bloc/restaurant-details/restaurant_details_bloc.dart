@@ -12,6 +12,7 @@ class RestaurantDetailsBloc extends Bloc<RestaurantDetailsEvent, RestaurantDetai
   RestaurantDetailsBloc() : super(RestaurantDetailsState()) {
     on<FetchRestaurantInfo>(_fetchRestaurantInfo);
     on<SetRestaurantFavorite>(_addFavorite);
+    on<SetCommentLike>(_setLike);
   }
 
   final RestaurantDetailsRepo _restaurantDetailsRepo = RestaurantDetailsRepo();
@@ -36,6 +37,22 @@ class RestaurantDetailsBloc extends Bloc<RestaurantDetailsEvent, RestaurantDetai
       emit(state.copyWith(status: RestaurantDetailStatus.loadRestaurantDataSuccess, restaurant: restaurant, isFavorite: isFavorite));
     } catch (e) {
       emit(state.copyWith(status: RestaurantDetailStatus.loadFailed));
+    }
+  }
+
+  void _setLike(
+      SetCommentLike event,
+      Emitter<RestaurantDetailsState> emit
+      )async {
+    emit(state.copyWith(status: RestaurantDetailStatus.onLike));
+    try {
+      RestaurantDetails info = state.restaurant!;
+      final RestaurantDetails restaurant = await _restaurantDetailsRepo.setCommentLike(commentUniqueId: event.commentUniqueId);
+      info.comments = restaurant.comments;
+
+      emit(state.copyWith(status: RestaurantDetailStatus.likeSuccessful, restaurant: info));
+    } catch (e) {
+      emit(state.copyWith(status: RestaurantDetailStatus.likeFailed));
     }
   }
 

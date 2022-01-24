@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,110 +7,93 @@ import 'package:flutter_notification/model/providers/user_model.dart';
 import 'package:flutter_notification/model/restaurant_comment_model.dart';
 import 'package:flutter_notification/model/restaurant_comment_photo_model.dart';
 import 'package:flutter_notification/ui/pages/restaurant/widget/restaurant_photo_wrapper.dart';
+import 'package:flutter_notification/ui/shared/widget/custom_app_bar.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/src/provider.dart';
 
-class FooderCommentCard extends StatefulWidget {
-  FooderCommentCard({
-    Key? key,
-    required this.comments,
-    required this.restaurantName,
-  }) : super(key: key);
-  List<RestaurantComment> comments;
-  String restaurantName;
+class FooderSingleReviewScreen extends StatefulWidget {
+  static const routeName = '/single-review';
+  const FooderSingleReviewScreen({Key? key}) : super(key: key);
+
   @override
-  _FooderCommentCardState createState() => _FooderCommentCardState();
+  _FooderSingleReviewScreenState createState() => _FooderSingleReviewScreenState();
 }
 
-class _FooderCommentCardState extends State<FooderCommentCard> {
-  late final AuthModel auth = context.read<AuthModel>();
+class _FooderSingleReviewScreenState extends State<FooderSingleReviewScreen> {
+  RestaurantComment? comment;
+  late final AuthModel auth;
   late final RestaurantDetailsBloc _restaurantDetailsBloc;
+  String _uniqueId = '';
   @override
   void initState() {
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+      auth = context.read<AuthModel>();
+    });
     _restaurantDetailsBloc = BlocProvider.of<RestaurantDetailsBloc>(context);
+    Future.delayed(Duration.zero, initSingleComment);
     super.initState();
+
   }
 
-  String commentTypeIcon(String type) {
-    if(type.toUpperCase() == 'GOOD') {
-      return "assets/img/delicious.svg";
-    } else if (type.toUpperCase() == 'NORMAL') {
-      return "assets/img/notBad.svg";
-    }
-    return"assets/img/normal.svg";
-  }
-
-  String commentTypeTitle(String type) {
-    if(type.toUpperCase() == 'GOOD') {
-      return "Delicious!";
-    } else if (type.toUpperCase() == 'NORMAL') {
-      return "Not Bad";
-    }
-    return "Normal";
-  }
-
+  void initSingleComment() async {
+    final arg = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final uniqueId = arg["uniqueId"];
+    setState(() {
+      _uniqueId = uniqueId;
+    });
+}
   @override
   Widget build(BuildContext context) {
-    final commentLength = widget.comments.isEmpty ? 0 : widget.comments.length > 3 ? 3 : widget.comments.length;
-    return Column(
-      children: [
-        for(var i = 0; i < commentLength; i++)
-          commentCard(widget.comments[i]),
-      ],
-    );
-  }
-
-  Widget commentCard(RestaurantComment comment) {
-    return  Container(
-      margin: const EdgeInsets.all(10),
-      child: Ink(
-        decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(
-              color: Colors.grey.withOpacity(0.2),
-            )
-        ),
-        child: InkWell(
-            onTap: () {
-              Navigator.of(context).pushNamed('/single-review', arguments: {
-                "uniqueId": comment.uniqueId,
-              });
+    final appbarTheme = Theme.of(context).appBarTheme;
+    return SafeArea(
+      child: Scaffold(
+        appBar: screenAppBar(appbarTheme, appTitle: 'Review'),
+        body: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: BlocBuilder<RestaurantDetailsBloc, RestaurantDetailsState>(
+            builder: (context, state) {
+              if(
+                state.status == RestaurantDetailStatus.onLike ||
+                state.status == RestaurantDetailStatus.likeSuccessful ||
+                state.status == RestaurantDetailStatus.loadRestaurantDataSuccess
+              ) {
+                final comment = state.restaurant!.comments.firstWhere((item) => item.uniqueId == _uniqueId);
+                return ListView(
+                  children:[
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                avatar(comment),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                writerInfo(comment),
+                              ],
+                            )
+                        ),
+                        commentType(comment)
+                      ],
+                    ),
+                    commentContent(comment),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    commentImageList(comment),
+                    commentExtraInfo(comment),
+                    const Divider(),
+                    commentFunctionList(comment),
+                  ] ,
+                );
+              }
+              return Container(
+              );
             },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              avatar(comment),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              writerInfo(comment),
-                            ],
-                          )
-                      ),
-                      commentType(comment)
-                    ],
-                  ),
-                  commentContent(comment),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  commentImageList(comment),
-                  commentExtraInfo(comment),
-                  const Divider(),
-                  commentFunctionList(comment),
-                ],
-              ),
-            )
-        ),
+          ),
+        )
       ),
     );
   }
@@ -176,14 +157,14 @@ class _FooderCommentCardState extends State<FooderCommentCard> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            width: 60,
-            height: 60,
-            child: SvgPicture.asset(icon)
+              width: 60,
+              height: 60,
+              child: SvgPicture.asset(icon)
           ),
-         // Padding(
-         //   padding: const EdgeInsets.only(right: 10, top: 10),
-         //  child: SvgPicture.asset(icon)
-         // ),
+          // Padding(
+          //   padding: const EdgeInsets.only(right: 10, top: 10),
+          //  child: SvgPicture.asset(icon)
+          // ),
           Center(
             child: Text(
               title,
@@ -199,6 +180,24 @@ class _FooderCommentCardState extends State<FooderCommentCard> {
     );
   }
 
+  String commentTypeIcon(String type) {
+    if(type.toUpperCase() == 'GOOD') {
+      return "assets/img/delicious.svg";
+    } else if (type.toUpperCase() == 'NORMAL') {
+      return "assets/img/notBad.svg";
+    }
+    return"assets/img/normal.svg";
+  }
+
+  String commentTypeTitle(String type) {
+    if(type.toUpperCase() == 'GOOD') {
+      return "Delicious!";
+    } else if (type.toUpperCase() == 'NORMAL') {
+      return "Not Bad";
+    }
+    return "Normal";
+  }
+
   Widget commentContent(RestaurantComment comment) {
     final textTheme = Theme.of(context).textTheme;
     return Container(
@@ -206,14 +205,12 @@ class _FooderCommentCardState extends State<FooderCommentCard> {
       child: Expanded(
         child: Text(
           comment.content,
-          overflow: TextOverflow.ellipsis,
-          maxLines: 5,
           style: textTheme.subtitle1!.copyWith(
             fontWeight: FontWeight.w300,
             fontSize: 16,
             height: 1.5,
           ),
-          ),
+        ),
       ),
     );
   }
@@ -227,18 +224,18 @@ class _FooderCommentCardState extends State<FooderCommentCard> {
       children: [
         InkWell(
           onTap: () {
-           Navigator.of(context).push(
-             MaterialPageRoute(
-               builder: (context) => FooderPhotoWrapper(
-                 galleryItems: galleryItems,
-                 user: user,
-                 backgroundDecoration: const BoxDecoration(
-                   color: Colors.black,
-                 ),
-                 initialIndex: index,
-               ),
-             )
-           );
+            Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => FooderPhotoWrapper(
+                    galleryItems: galleryItems,
+                    user: user,
+                    backgroundDecoration: const BoxDecoration(
+                      color: Colors.black,
+                    ),
+                    initialIndex: index,
+                  ),
+                )
+            );
           },
           child: CachedNetworkImage(
             fit: BoxFit.cover,
@@ -260,7 +257,7 @@ class _FooderCommentCardState extends State<FooderCommentCard> {
             errorWidget: (context, url, error) => const Icon(Icons.error),
           ),
         ),
-       const SizedBox(width: 3,),
+        const SizedBox(width: 3,),
       ],
     );
   }
@@ -297,7 +294,7 @@ class _FooderCommentCardState extends State<FooderCommentCard> {
             child: Row(
               children: [
                 Text(
-                 '${comment.likeTotal} Like',
+                  '${comment.likeTotal} Like',
                   style: textTheme.subtitle2!.copyWith(
                     color: Colors.grey[400],
                   ),
@@ -337,7 +334,6 @@ class _FooderCommentCardState extends State<FooderCommentCard> {
                 } else {
                   _restaurantDetailsBloc.add(SetCommentLike(comment.uniqueId));
                 }
-
               },
             ),
             const SizedBox(width: 10,),
@@ -390,7 +386,7 @@ class _FooderCommentCardState extends State<FooderCommentCard> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(
-             isActive == true ? activeIcon : inActiveIcon,
+              isActive == true ? activeIcon : inActiveIcon,
               size: 25,
               color: isActive == true? activeColor :  Theme.of(context).secondaryHeaderColor,
             ),
@@ -405,4 +401,5 @@ class _FooderCommentCardState extends State<FooderCommentCard> {
       ),
     );
   }
+
 }
