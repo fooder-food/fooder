@@ -4,6 +4,9 @@ enum RestaurantDetailStatus{
   initial,
   onLoadRestaurantData,
   onLike,
+  onDel,
+  delSuccessful,
+  delFailed,
   likeSuccessful,
   likeFailed,
   loadRestaurantDataSuccess,
@@ -34,5 +37,5 @@ class RestaurantDetailsState extends Equatable {
 
   @override
   // TODO: implement props
-  List<Object?> get props => [status, restaurant, isFavorite];
+  List<Object?> get props => [status, restaurant, isFavorite,];
 }

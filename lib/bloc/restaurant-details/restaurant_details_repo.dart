@@ -34,4 +34,8 @@ class RestaurantDetailsRepo {
   Future<void> delFavorite({
     required String uniqueId,
   }) async => _restaurantDetailsApiProvider.deleteFavorite(uniqueId: uniqueId);
+
+  Future<RestaurantDetails> delReview({
+  required String commentUniqueId,
+}) async => _restaurantDetailsApiProvider.deleteReview(commentUnique: commentUniqueId);
 }

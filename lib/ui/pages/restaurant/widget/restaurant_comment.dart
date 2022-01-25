@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,8 +10,10 @@ import 'package:flutter_notification/model/providers/user_model.dart';
 import 'package:flutter_notification/model/restaurant_comment_model.dart';
 import 'package:flutter_notification/model/restaurant_comment_photo_model.dart';
 import 'package:flutter_notification/ui/pages/restaurant/widget/restaurant_photo_wrapper.dart';
+import 'package:flutter_notification/ui/pages/review/edit_review.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 
 class FooderCommentCard extends StatefulWidget {
@@ -18,9 +21,13 @@ class FooderCommentCard extends StatefulWidget {
     Key? key,
     required this.comments,
     required this.restaurantName,
+    required this.restaurantUnique,
+    this.type = 'NORMAL',
   }) : super(key: key);
   List<RestaurantComment> comments;
   String restaurantName;
+  String restaurantUnique;
+  String type;
   @override
   _FooderCommentCardState createState() => _FooderCommentCardState();
 }
@@ -52,9 +59,72 @@ class _FooderCommentCardState extends State<FooderCommentCard> {
     return "Normal";
   }
 
+  void _commentOptions(RestaurantComment comment) {
+    final textTheme = Theme.of(context).textTheme;
+    final user = auth.user?.user;
+    if(
+      user != null &&
+      user.uniqueId == comment.user.uniqueId
+    ) {
+      showAdaptiveActionSheet(
+        context: context,
+        title: Text('Select Action', style: textTheme.subtitle1,),
+        actions: <BottomSheetAction>[
+          BottomSheetAction(
+              leading: Container(
+                padding: const EdgeInsets.only(right: 10),
+                child: const Icon(Icons.edit_rounded, color: Colors.grey,),
+              ),
+              title: Text('Edit review', style: textTheme.subtitle1,),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pushNamed('/edit-review', arguments: {
+                  "uniqueId": comment.uniqueId,
+                  "restaurantUniqueId": widget.restaurantUnique,
+                });
+
+              }
+          ),
+          BottomSheetAction(
+              leading: Container(
+                padding: const EdgeInsets.only(right: 10),
+                child: const Icon(Icons.delete_rounded, color: Colors.grey,),
+              ),
+              title: Text('Delete review', style: textTheme.subtitle1,),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _restaurantDetailsBloc.add(DeleteReview(comment.uniqueId));
+              }
+          ),
+        ],
+      );
+    } else {
+      showAdaptiveActionSheet(
+        context: context,
+        title: Text('Select Action', style: textTheme.subtitle1,),
+        actions: <BottomSheetAction>[
+          BottomSheetAction(
+              leading: Container(
+                padding: const EdgeInsets.only(right: 10),
+                child: const Icon(Icons.report_rounded, color: Colors.grey,),
+              ),
+              title: Text('Report review', style: textTheme.subtitle1,),
+              onPressed: () {
+              }
+          ),
+        ],
+      );
+    }
+
+  }
+
   @override
   Widget build(BuildContext context) {
-    final commentLength = widget.comments.isEmpty ? 0 : widget.comments.length > 3 ? 3 : widget.comments.length;
+
+    final commentLength = widget.type != 'NORMAL'
+        ?  widget.comments.length
+        :widget.comments.isEmpty ? 0 : widget.comments.length > 3 ? 3 : widget.comments.length;
+
     return Column(
       children: [
         for(var i = 0; i < commentLength; i++)
@@ -77,6 +147,7 @@ class _FooderCommentCardState extends State<FooderCommentCard> {
             onTap: () {
               Navigator.of(context).pushNamed('/single-review', arguments: {
                 "uniqueId": comment.uniqueId,
+                "restaurantUniqueId": widget.restaurantUnique,
               });
             },
             child: Padding(
@@ -353,22 +424,32 @@ class _FooderCommentCardState extends State<FooderCommentCard> {
             // ),
           ],
         ),
-        PopupMenuButton<String>(
-          icon: Icon(
+        GestureDetector(
+          onTap: () {
+            _commentOptions(comment);
+          },
+          child: Icon(
             Icons.more_horiz_rounded,
             size: 25,
             color: Theme.of(context).secondaryHeaderColor,
           ),
-          onSelected: (value) {},
-          itemBuilder: (BuildContext context) {
-            return {'Logout', 'Settings'}.map((String choice) {
-              return PopupMenuItem<String>(
-                value: choice,
-                child: Text(choice),
-              );
-            }).toList();
-          },
         ),
+        // PopupMenuButton<String>(
+        //   icon: Icon(
+        //     Icons.more_horiz_rounded,
+        //     size: 25,
+        //     color: Theme.of(context).secondaryHeaderColor,
+        //   ),
+        //   onSelected: (value) {},
+        //   itemBuilder: (BuildContext context) {
+        //     return {'Logout', 'Settings'}.map((String choice) {
+        //       return PopupMenuItem<String>(
+        //         value: choice,
+        //         child: Text(choice),
+        //       );
+        //     }).toList();
+        //   },
+        // ),
       ],
     );
   }

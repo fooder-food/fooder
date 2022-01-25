@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_notification/bloc/restaurant-details/restaurant_details_repo.dart';
+import 'package:flutter_notification/model/restaurant_comment_model.dart';
 import 'package:flutter_notification/model/restaurant_details_model.dart';
 
 part 'restaurant_details_event.dart';
@@ -13,6 +14,7 @@ class RestaurantDetailsBloc extends Bloc<RestaurantDetailsEvent, RestaurantDetai
     on<FetchRestaurantInfo>(_fetchRestaurantInfo);
     on<SetRestaurantFavorite>(_addFavorite);
     on<SetCommentLike>(_setLike);
+    on<DeleteReview>(_deleteReview);
   }
 
   final RestaurantDetailsRepo _restaurantDetailsRepo = RestaurantDetailsRepo();
@@ -53,6 +55,20 @@ class RestaurantDetailsBloc extends Bloc<RestaurantDetailsEvent, RestaurantDetai
       emit(state.copyWith(status: RestaurantDetailStatus.likeSuccessful, restaurant: info));
     } catch (e) {
       emit(state.copyWith(status: RestaurantDetailStatus.likeFailed));
+    }
+  }
+
+  void _deleteReview(
+    DeleteReview event,
+    Emitter<RestaurantDetailsState> emit
+  ) async {
+    emit(state.copyWith(status: RestaurantDetailStatus.onDel));
+    try {
+      final RestaurantDetails restaurant = await _restaurantDetailsRepo.delReview(commentUniqueId: event.uniqueId);
+
+      emit(state.copyWith(status: RestaurantDetailStatus.delSuccessful, restaurant: restaurant));
+    } catch (e) {
+      emit(state.copyWith(status: RestaurantDetailStatus.delSuccessful));
     }
   }
 

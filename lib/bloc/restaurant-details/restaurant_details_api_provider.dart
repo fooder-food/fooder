@@ -11,6 +11,7 @@ class RestaurantDetailsApiProvider {
   required String uniqueId
   }) async{
     try {
+      print(uniqueId);
       final response = await _networkService.get('restaurants/$uniqueId',);
       final data = response.data["data"];
       final RestaurantDetails restaurant = RestaurantDetails.fromJson(data as Map<String, dynamic>);
@@ -70,5 +71,20 @@ class RestaurantDetailsApiProvider {
     }
   }
 
+  Future<RestaurantDetails> deleteReview({
+    required String commentUnique,
+}) async {
+    try {
+      final response = await _networkService.del('restaurants/comments/$commentUnique',);
+      final data = response.data!["data"];
+      final RestaurantDetails restaurant = RestaurantDetails.fromJson(data as Map<String, dynamic>);
+      print(restaurant);
+      return restaurant;
+
+    } catch(e) {
+      debugPrint("err cat: ${e.toString()}");
+      throw Exception(e);
+    }
+  }
 
 }

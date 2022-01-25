@@ -21,6 +21,8 @@ import 'package:flutter_notification/ui/pages/restaurant/restaurant_info_map.dar
 import 'package:flutter_notification/ui/pages/restaurant/restaurant_locate.dart';
 import 'package:flutter_notification/ui/pages/restaurant/search_country.dart';
 import 'package:flutter_notification/ui/pages/restaurant/single_restaurant_info.dart';
+import 'package:flutter_notification/ui/pages/review/all_review.dart';
+import 'package:flutter_notification/ui/pages/review/edit_review.dart';
 import 'package:flutter_notification/ui/pages/review/review.dart';
 import 'package:flutter_notification/ui/pages/review/review_image_picker.dart';
 import 'package:flutter_notification/ui/pages/review/single_review.dart';
@@ -68,6 +70,8 @@ class FooderRoute {
     FooderFavoriteScreen.routeName: (ctx) => const FooderFavoriteScreen(),
     FooderRestaurantInfoMap.routeName: (ctx) => const FooderRestaurantInfoMap(),
     FooderSingleReviewScreen.routeName: (ctx) => const FooderSingleReviewScreen(),
+    FooderAllReviewScreen.routeName: (ctx) => const FooderAllReviewScreen(),
+    FooderRestaurantEditReviewScreen.routeName: (ctx) => const FooderRestaurantEditReviewScreen(),
   };
 
   //route factory

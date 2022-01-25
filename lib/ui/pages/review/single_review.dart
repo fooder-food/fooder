@@ -1,3 +1,4 @@
+import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,6 +26,7 @@ class _FooderSingleReviewScreenState extends State<FooderSingleReviewScreen> {
   late final AuthModel auth;
   late final RestaurantDetailsBloc _restaurantDetailsBloc;
   String _uniqueId = '';
+  String _restaurantUnique = '';
   @override
   void initState() {
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
@@ -41,8 +43,61 @@ class _FooderSingleReviewScreenState extends State<FooderSingleReviewScreen> {
     final uniqueId = arg["uniqueId"];
     setState(() {
       _uniqueId = uniqueId;
+      _restaurantUnique = arg['restaurantUniqueId'];
     });
 }
+  void _commentOptions(RestaurantComment comment) {
+    final textTheme = Theme.of(context).textTheme;
+    if(auth.user?.user != null) {
+      showAdaptiveActionSheet(
+        context: context,
+        title: Text('Select Action', style: textTheme.subtitle1,),
+        actions: <BottomSheetAction>[
+          BottomSheetAction(
+              leading: Container(
+                padding: const EdgeInsets.only(right: 10),
+                child: const Icon(Icons.edit_rounded, color: Colors.grey,),
+              ),
+              title: Text('Edit review', style: textTheme.subtitle1,),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pushNamed('/edit-review', arguments: {
+                  "uniqueId": comment.uniqueId,
+                  "restaurantUniqueId": _restaurantUnique,
+                });
+
+              }
+          ),
+          BottomSheetAction(
+              leading: Container(
+                padding: const EdgeInsets.only(right: 10),
+                child: const Icon(Icons.delete_rounded, color: Colors.grey,),
+              ),
+              title: Text('Delete review', style: textTheme.subtitle1,),
+              onPressed: () {
+              }
+          ),
+        ],
+      );
+    } else {
+      showAdaptiveActionSheet(
+        context: context,
+        title: Text('Select Action', style: textTheme.subtitle1,),
+        actions: <BottomSheetAction>[
+          BottomSheetAction(
+              leading: Container(
+                padding: const EdgeInsets.only(right: 10),
+                child: const Icon(Icons.report_rounded, color: Colors.grey,),
+              ),
+              title: Text('Report review', style: textTheme.subtitle1,),
+              onPressed: () {
+              }
+          ),
+        ],
+      );
+    }
+
+  }
   @override
   Widget build(BuildContext context) {
     final appbarTheme = Theme.of(context).appBarTheme;
@@ -349,21 +404,15 @@ class _FooderSingleReviewScreenState extends State<FooderSingleReviewScreen> {
             // ),
           ],
         ),
-        PopupMenuButton<String>(
-          icon: Icon(
+        GestureDetector(
+          onTap: () {
+            _commentOptions(comment);
+          },
+          child: Icon(
             Icons.more_horiz_rounded,
             size: 25,
             color: Theme.of(context).secondaryHeaderColor,
           ),
-          onSelected: (value) {},
-          itemBuilder: (BuildContext context) {
-            return {'Logout', 'Settings'}.map((String choice) {
-              return PopupMenuItem<String>(
-                value: choice,
-                child: Text(choice),
-              );
-            }).toList();
-          },
         ),
       ],
     );

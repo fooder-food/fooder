@@ -6,6 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_notification/bloc/restaurant-details/restaurant_details_bloc.dart';
 import 'package:flutter_notification/model/geo_model.dart';
 import 'package:flutter_notification/model/providers/user_model.dart';
+import 'package:flutter_notification/model/restaurant_comment_model.dart';
+import 'package:flutter_notification/model/restaurant_details_model.dart';
 import 'package:flutter_notification/ui/pages/restaurant/widget/restaurant_comment.dart';
 import 'package:flutter_notification/ui/shared/widget/custom_app_bar.dart';
 import 'package:flutter_notification/ui/shared/widget/loading.dart';
@@ -110,16 +112,27 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
     ));
   }
 
-  void _writeComment() async {
+  void _writeComment(RestaurantDetails restaurant) async {
+    final comments = restaurant.comments;
     if(auth.user == null) {
       await Navigator.of(context).pushNamed('/login');
     } else {
-      await Navigator.of(context).pushNamed('/review',arguments: {
-        'uniqueId': restaurantUniqueId ,
-      });
-      _restaurantDetailsBloc.add(FetchRestaurantInfo(restaurantUniqueId,
-        userUniqueId: auth.user?.user?.uniqueId,
-      ));
+      final isExist = comments.indexWhere((comment) => auth.user!.user!.uniqueId == comment.user.uniqueId);
+      if(isExist >= 0) {
+        final comment = comments.firstWhere((comment) => auth.user!.user!.uniqueId == comment.user.uniqueId);
+        Navigator.of(context).pushNamed('/edit-review', arguments: {
+          "uniqueId": comment.uniqueId,
+          "restaurantUniqueId": restaurantUniqueId,
+        });
+      } else {
+        await Navigator.of(context).pushNamed('/review',arguments: {
+          'uniqueId': restaurantUniqueId ,
+        });
+        _restaurantDetailsBloc.add(FetchRestaurantInfo(restaurantUniqueId,
+          userUniqueId: auth.user?.user?.uniqueId,
+        ));
+      }
+
     }
 
 
@@ -281,7 +294,9 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
         state.status == RestaurantDetailStatus.loadRestaurantDataSuccess ||
         state.status == RestaurantDetailStatus.onSetFavorite ||
         state.status == RestaurantDetailStatus.onLike ||
-        state.status == RestaurantDetailStatus.likeSuccessful
+        state.status == RestaurantDetailStatus.likeSuccessful ||
+        state.status == RestaurantDetailStatus.onDel ||
+        state.status == RestaurantDetailStatus.delSuccessful
         ) {
           return restaurantScaffold(state);
         }
@@ -562,7 +577,7 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
               Expanded(
                 child: InkWell(
                   onTap: () {
-                    _writeComment();
+                    _writeComment(state.restaurant!);
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
@@ -1084,7 +1099,11 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
         // ),
         commentType(state),
         const Divider(),
-        FooderCommentCard(comments: state.restaurant!.comments, restaurantName: state.restaurant!.restaurantName,)
+        FooderCommentCard(
+          restaurantUnique: state.restaurant!.uniqueId,
+          comments: state.restaurant!.comments,
+          restaurantName: state.restaurant!.restaurantName,
+        )
       ],
     );
   }
@@ -1101,7 +1120,11 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
             children: [
               Expanded(
                 child: InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).pushNamed('/all-review', arguments: {
+                      "index": 1,
+                    });
+                  },
                   child: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Column(
@@ -1129,7 +1152,11 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
               ),
               Expanded(
                 child: InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).pushNamed('/all-review', arguments: {
+                      "index": 2,
+                    });
+                  },
                   child: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Column(
@@ -1157,7 +1184,11 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
               ),
               Expanded(
                 child: InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).pushNamed('/all-review', arguments: {
+                      "index": 3,
+                    });
+                  },
                   child: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Column(

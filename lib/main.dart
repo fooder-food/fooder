@@ -10,6 +10,7 @@ import 'package:flutter_notification/bloc/auth/auth_bloc.dart';
 import 'package:flutter_notification/bloc/favorite/favorite_bloc.dart';
 import 'package:flutter_notification/bloc/home/home_bloc.dart';
 import 'package:flutter_notification/bloc/restaurant-details/restaurant_details_bloc.dart';
+import 'package:flutter_notification/bloc/review/review_bloc.dart';
 import 'package:flutter_notification/bloc/search-country/search_country_bloc.dart';
 import 'package:flutter_notification/bloc/search-country/search_country_repo.dart';
 import 'package:flutter_notification/bloc/search-restaurant/search_restaurant_bloc.dart';
@@ -50,6 +51,7 @@ void main() async{
             BlocProvider<SearchRestaurantBloc>(create: (_) =>SearchRestaurantBloc()),
             BlocProvider<AddListBloc>(create: (_) =>AddListBloc()),
             BlocProvider<FavoriteBloc>(create:(_) => FavoriteBloc()),
+            BlocProvider<ReviewBloc>(create: (_) => ReviewBloc()),
           ],
           child: MultiProvider(
             providers: [

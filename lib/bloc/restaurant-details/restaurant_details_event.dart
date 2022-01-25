@@ -33,3 +33,8 @@ class SetRestaurantFavorite extends RestaurantDetailsEvent {
   final String userUniqueId;
   final String uniqueId;
 }
+
+class DeleteReview extends RestaurantDetailsEvent {
+  const DeleteReview(this.uniqueId);
+  final String uniqueId;
+}
