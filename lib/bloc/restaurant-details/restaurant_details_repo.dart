@@ -5,6 +5,7 @@ import 'package:flutter_notification/bloc/restaurant-location/restaurant_locatio
 import 'package:flutter_notification/model/google_autocomplete_place_model.dart';
 import 'package:flutter_notification/model/google_map_location_model.dart';
 import 'package:flutter_notification/model/google_place_details_model.dart';
+import 'package:flutter_notification/model/restaurant_comment_photo_model.dart';
 import 'package:flutter_notification/model/restaurant_details_model.dart';
 
 class RestaurantDetailsRepo {
@@ -38,4 +39,8 @@ class RestaurantDetailsRepo {
   Future<RestaurantDetails> delReview({
   required String commentUniqueId,
 }) async => _restaurantDetailsApiProvider.deleteReview(commentUnique: commentUniqueId);
+
+  Future<List<RestaurantCommentPhoto>> fetchPhotos({
+  required String uniqueId,
+}) async => _restaurantDetailsApiProvider.fetchAllPhoto(uniqueId: uniqueId);
 }

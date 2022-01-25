@@ -38,3 +38,8 @@ class DeleteReview extends RestaurantDetailsEvent {
   const DeleteReview(this.uniqueId);
   final String uniqueId;
 }
+
+class FetchAllPhotos extends RestaurantDetailsEvent {
+  const FetchAllPhotos(this.uniqueId);
+  final String uniqueId;
+}

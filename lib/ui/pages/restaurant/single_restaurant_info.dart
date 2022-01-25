@@ -343,7 +343,8 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
       itemCount: state.restaurant!.photos.length <= 5 ? state.restaurant!.photos.length : 5 ,
       scrollDirection: Axis.horizontal,
       itemBuilder: (context, index) {
-        bool isLast = state.restaurant!.photos.length == 4;
+       // bool isLast = state.restaurant!.photos.length == 4;
+        bool isLast = state.restaurant!.photos.length == (index + 1);
         return Material(
             child: Ink(
               width: 150,
@@ -359,7 +360,13 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
               //     )
               // ),
               child: InkWell(
-                onTap: () {},
+                onTap: () {
+                  if(isLast) {
+                    Navigator.of(context).pushNamed('/view-all-images', arguments: {
+                      'restaurantUniqueId': restaurantUniqueId,
+                    });
+                  }
+                },
                 child: Stack(
                   children: [
                     Positioned.fill(

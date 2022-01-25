@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_notification/core/service/network/network_service.dart';
+import 'package:flutter_notification/model/restaurant_comment_photo_model.dart';
 import 'package:flutter_notification/model/restaurant_details_model.dart';
 
 
@@ -80,6 +81,23 @@ class RestaurantDetailsApiProvider {
       final RestaurantDetails restaurant = RestaurantDetails.fromJson(data as Map<String, dynamic>);
       print(restaurant);
       return restaurant;
+
+    } catch(e) {
+      debugPrint("err cat: ${e.toString()}");
+      throw Exception(e);
+    }
+  }
+
+  Future<List<RestaurantCommentPhoto>> fetchAllPhoto({
+  required String uniqueId,
+}) async {
+    try {
+      final response = await _networkService.get('restaurants/photos/$uniqueId');
+      final data = response.data!["data"];
+      final List<RestaurantCommentPhoto> photos = List.from(
+        data.map((restaurant) => RestaurantCommentPhoto.fromJson(restaurant)),
+      );
+      return photos;
 
     } catch(e) {
       debugPrint("err cat: ${e.toString()}");

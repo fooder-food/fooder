@@ -16,7 +16,7 @@ class FooderPhotoWrapper extends StatefulWidget {
     this.maxScale,
     this.initialIndex = 0,
     required this.galleryItems,
-    required this.user,
+    this.user,
     this.scrollDirection = Axis.horizontal,
   }) : pageController = PageController(initialPage: initialIndex), super(key: key);
   final LoadingBuilder? loadingBuilder;
@@ -27,7 +27,7 @@ class FooderPhotoWrapper extends StatefulWidget {
   final List<RestaurantCommentPhoto> galleryItems;
   final Axis scrollDirection;
   final PageController pageController;
-  final CommentUser user;
+  final CommentUser? user;
   @override
   State<FooderPhotoWrapper> createState() => _FooderPhotoWrapperState();
 }
@@ -76,6 +76,7 @@ class _FooderPhotoWrapperState extends State<FooderPhotoWrapper> {
                   ),
                 ),
             ),
+            if(widget.user != null)
             Positioned(
                 top: 10,
                 left: 20,
@@ -108,11 +109,11 @@ class _FooderPhotoWrapperState extends State<FooderPhotoWrapper> {
                       duration: const Duration(milliseconds: 500),
                       child: Row(
                         children: [
-                          avatar(widget.user),
+                          avatar(widget.user!),
                           Container(
                             padding: const EdgeInsets.all(20.0),
                             child: Text(
-                              widget.user.username,
+                              widget.user!.username,
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 17.0,

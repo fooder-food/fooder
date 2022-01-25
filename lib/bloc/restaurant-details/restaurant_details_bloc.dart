@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_notification/bloc/restaurant-details/restaurant_details_repo.dart';
 import 'package:flutter_notification/model/restaurant_comment_model.dart';
+import 'package:flutter_notification/model/restaurant_comment_photo_model.dart';
 import 'package:flutter_notification/model/restaurant_details_model.dart';
 
 part 'restaurant_details_event.dart';
@@ -12,6 +13,7 @@ part 'restaurant_details_state.dart';
 class RestaurantDetailsBloc extends Bloc<RestaurantDetailsEvent, RestaurantDetailsState> {
   RestaurantDetailsBloc() : super(RestaurantDetailsState()) {
     on<FetchRestaurantInfo>(_fetchRestaurantInfo);
+    on<FetchAllPhotos>(_fetchAllPhotos);
     on<SetRestaurantFavorite>(_addFavorite);
     on<SetCommentLike>(_setLike);
     on<DeleteReview>(_deleteReview);
@@ -37,6 +39,20 @@ class RestaurantDetailsBloc extends Bloc<RestaurantDetailsEvent, RestaurantDetai
       }
 
       emit(state.copyWith(status: RestaurantDetailStatus.loadRestaurantDataSuccess, restaurant: restaurant, isFavorite: isFavorite));
+    } catch (e) {
+      emit(state.copyWith(status: RestaurantDetailStatus.loadFailed));
+    }
+  }
+
+  void _fetchAllPhotos(
+      FetchAllPhotos event,
+      Emitter<RestaurantDetailsState> emit
+      ) async {
+    emit(state.copyWith(status: RestaurantDetailStatus.onLoadRestaurantData));
+    try {
+      final List<RestaurantCommentPhoto> photos = await _restaurantDetailsRepo.fetchPhotos(uniqueId: event.uniqueId);
+
+      emit(state.copyWith(status: RestaurantDetailStatus.loadRestaurantDataSuccess, photos: photos));
     } catch (e) {
       emit(state.copyWith(status: RestaurantDetailStatus.loadFailed));
     }
