@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 //id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 
 apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services'
+//apply plugin: 'com.google.gms.google-services'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 

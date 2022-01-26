@@ -8,6 +8,7 @@ import 'package:flutter_notification/bloc/auth/auth_repo.dart';
 import 'package:flutter_notification/core/service/storage/storage_service.dart';
 import 'package:flutter_notification/model/auth_model.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -44,14 +45,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           emit(AuthenticatingState());
           String email = event.email;
           String password = event.password;
-        //  final messaging = FirebaseMessaging.instance;
-          final token = await FirebaseMessaging.instance.getToken();
-          print(token);
-          final Auth auth = await _authRepo.login(email: email, password: password, deviceToken: token!);
+          final status = await OneSignal.shared.getDeviceState();
+          final Auth auth = await _authRepo.login(email: email, password: password, deviceToken: status!.userId!);
           if(auth.user == null) {
             emit(UnAuthenticatedState(auth));
             return;
           }
+          OneSignal.shared.setExternalUserId(auth.user!.uniqueId);
           final String userEncode = jsonEncode(auth.toJson());
           StorageService().setStr('user', userEncode);
           // Auth user = Auth.fromJson(jsonDecode(await StorageService().getByKey('user') as String));

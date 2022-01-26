@@ -6,8 +6,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_notification/bloc/home/home_bloc.dart';
 import 'package:flutter_notification/bloc/search_place/search_place_bloc.dart';
 import 'package:flutter_notification/core/service/storage/storage_service.dart';
+import 'package:flutter_notification/model/find_place_state_model.dart';
 import 'package:flutter_notification/model/providers/select_place.dart';
 import 'package:flutter_notification/model/providers/user_search_radius.dart';
+import 'package:provider/provider.dart';
 
 
 
@@ -22,7 +24,7 @@ class _FooderSelectPlaceScreenState extends State<FooderSelectPlaceScreen> {
   late SearchPlaceBloc _seachPlaceBloc;
   late HomeBloc _homeBloc;
   bool firstView = false;
-
+  String selectedPlace = '';
 
   @override
   void initState() {
@@ -39,6 +41,20 @@ class _FooderSelectPlaceScreenState extends State<FooderSelectPlaceScreen> {
     setState(() {
       firstView = _firstView == null;
     });
+  }
+
+  void initSelectedPlace() async {
+    final String? _selectedPlace = await StorageService().getByKey('select_place');
+    if(_selectedPlace != null) {
+      setState(() {
+        selectedPlace = _selectedPlace;
+      });
+
+      final Map<String, dynamic> decoded = jsonDecode(selectedPlace) as Map<String, dynamic>;
+
+      final FindPlaceState _selectedPlaceModel = FindPlaceState.fromJson(decoded);
+      context.read<SelectPlaceModel>().updateState(_selectedPlaceModel);
+    }
   }
 
   Widget header() {
@@ -138,10 +154,16 @@ class _FooderSelectPlaceScreenState extends State<FooderSelectPlaceScreen> {
                               sort: userRadiusModel.selectedSorting,
                               filter: userRadiusModel.selectedCategoryIdList,
                               state: state.states[index].name,
-                            )
+                             )
                             );
 
                             final String? _firstView = await StorageService().getByKey('first_view');
+
+                            final String? _selectePlace = await StorageService().getByKey('select_place');
+                            if(_selectePlace == null) {
+                              final selectPlaceEncode = jsonEncode(context.read<SelectPlaceModel>().selectedPlace!);
+                              StorageService().setStr('select_place', selectPlaceEncode);
+                            }
                             if(_firstView == null) {
                               final String firstViewEncode = jsonEncode(true);
                               await StorageService().setStr('first_view', firstViewEncode);
@@ -153,6 +175,18 @@ class _FooderSelectPlaceScreenState extends State<FooderSelectPlaceScreen> {
                             }
 
                           },
+
+                          trailing: context.read<SelectPlaceModel>().selectedPlace != null
+                            && context.read<SelectPlaceModel>().selectedPlace!.id == state.states[index].id
+                          ? Consumer<SelectPlaceModel>(
+                            builder: (_, selectedPlaceModel,__ ) {
+                              return Icon(
+                                Icons.check_rounded,
+                                color: Theme.of(context).primaryColor,
+                              );
+                            }
+                          )
+                          : null,
                           title: Text(state.states[index].name),
                         );
                       },

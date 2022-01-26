@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ffi';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -10,6 +11,8 @@ import 'package:flutter_notification/bloc/add-restaurant/add_restaurant_bloc.dar
 import 'package:flutter_notification/bloc/home/home_bloc.dart';
 import 'package:flutter_notification/core/service/geo/geo_location.dart';
 import 'package:flutter_notification/core/service/storage/storage_service.dart';
+import 'package:flutter_notification/model/find_place_state_model.dart';
+import 'package:flutter_notification/model/providers/notification_count_model.dart';
 import 'package:flutter_notification/model/providers/select_place.dart';
 import 'package:flutter_notification/model/providers/user_model.dart';
 import 'package:flutter_notification/model/providers/user_search_radius.dart';
@@ -53,6 +56,7 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
   final GeoLocationService _geoLocationService = GeoLocationService();
   bool hasLocation = false;
   bool _toTopButtonIsShow = false;
+  String selectedPlace = '';
   late AddRestaurantBloc _addRestaurantBloc;
 
   @override
@@ -80,6 +84,18 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
   }
 
   Future<void> initRestaurant() async {
+    final String? _selectedPlace = await StorageService().getByKey('select_place');
+    if(_selectedPlace != null) {
+      setState(() {
+        selectedPlace = _selectedPlace;
+      });
+
+      final Map<String, dynamic> decoded = jsonDecode(selectedPlace) as Map<String, dynamic>;
+
+      final FindPlaceState _selectedPlaceModel = FindPlaceState.fromJson(decoded);
+      context.read<SelectPlaceModel>().updateState(_selectedPlaceModel);
+    }
+
     final locationFirst = context.read<SelectPlaceModel>().locationFirst;
     final userSearchModel = context.read<UserSearchRadiusModel>();
     try {
@@ -125,6 +141,10 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
           state: selectedPlace!.name,
           filter: userSearchModel.selectedCategoryIdList,
         ));
+      }
+      final auth = context.read<AuthModel>();
+      if(auth.user != null) {
+        homeBloc.add(const GetNotificationCount());
       }
 
     } catch(e) {
@@ -418,7 +438,7 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
         actions: [
           Row(
             children: [
-              notificationsIcon(context),
+              notificationsIcon(),
               const SizedBox(
                 width: 15,
               ),
@@ -442,44 +462,61 @@ class _FooderHomeScreenState extends State<FooderHomeScreen> {
     );
   }
 
-  Widget notificationsIcon(BuildContext context) {
+  Widget notificationsIcon() {
     return GestureDetector(
+      onTap: () {
+        Navigator.of(context).pushNamed('/notification');
+      },
       child: Stack(
         children: [
-          const Icon(
-            Icons.notifications,
-            size: 38,
-            color: Colors.black45,
+          Consumer<AuthModel>(
+              builder: (_, auth,__) {
+                if(auth.user != null) {
+                  return const Icon(
+                      Icons.notifications,
+                      size: 38,
+                      color: Colors.black45,
+                      );
+                }
+                return const Center(
+                  child:  Icon(
+                  Icons.notifications,
+                  size: 38,
+                  color: Colors.black45,
+                  ),
+                );
+              }
           ),
-          Positioned(
-            right: 0,
-            top: 1,
-            child: ClipOval(
-              child: Container(
-                padding: const EdgeInsets.all(1),
-                color: Colors.white,
-                child: ClipOval(
-                  child: Container(
-                    width: 18,
-                    height: 18,
-                    color: Colors.red,
-                    child: Padding(
-                      padding: const EdgeInsets.all(2.0),
-                      child: Center(
-                        child: Text(
-                          '1',
-                          style: Theme.of(context).textTheme.subtitle2!.copyWith(
+          Consumer<AuthModel>(
+            builder: (_, auth, __) {
+              if(auth.user != null) {
+                return BlocBuilder<HomeBloc, HomeState>(
+                  builder: (context,state) {
+                    if(state.totalNotificationCount != null) {
+                      return Positioned(
+                        right: 0,
+                        top: 1,
+                        child: ClipOval(
+                          child: Container(
+                            padding: const EdgeInsets.all(1),
                             color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
+                            child: ClipOval(
+                              child: Container(
+                                width: 10,
+                                height: 10,
+                                color: Colors.red,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+                      );
+                    }
+                    return Container();
+                  },
+                );
+              }
+              return Container();
+            },
           )
         ],
       ),

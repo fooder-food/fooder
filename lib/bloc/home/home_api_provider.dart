@@ -49,5 +49,17 @@ class HomeApiProvider {
     }
   }
 
+  Future<int> fetchNotificationCount() async {
+    try {
+      final response = await _networkService.get('users/notifications/count');
+      final data = response.data["data"];
+      return data;
+
+    } catch(e) {
+      debugPrint("err cat: ${e.toString()}");
+      throw Exception(e);
+    }
+  }
+
 
 }

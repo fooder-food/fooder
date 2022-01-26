@@ -28,4 +28,6 @@ class HomeRepo {
     sort: sort,
     filter: filter,
   );
+
+  Future<int> fetchNotificationCount() async => _homeApiProvider.fetchNotificationCount();
 }

@@ -12,6 +12,7 @@ import 'package:flutter_notification/ui/pages/main/init_items.dart';
 import 'package:flutter_notification/ui/pages/splash/request_location.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/src/provider.dart';
 
@@ -24,11 +25,15 @@ class FooderMainScreen extends StatefulWidget {
 }
 
 class _FooderMainScreenState extends State<FooderMainScreen> with AfterLayoutMixin<FooderMainScreen> {
+//one signal
+
 
   @override
   void initState() {
     super.initState();
   }
+
+
 
 
   void addRestaurant(BuildContext context) {

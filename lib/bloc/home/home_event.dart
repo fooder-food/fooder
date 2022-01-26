@@ -22,3 +22,7 @@ class FetchAllRestaurant extends HomeEvent {
   final List<String> filter;
   final String? state;
 }
+
+class GetNotificationCount extends HomeEvent {
+  const GetNotificationCount();
+}

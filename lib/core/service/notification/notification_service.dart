@@ -8,16 +8,14 @@ class NotificationService {
   static final _notification = FlutterLocalNotificationsPlugin();
   static final onNotifications = BehaviorSubject<String?>();
 
-  static Future init({bool isScheduled = false}) async{
+  static Future init({bool isScheduled = false, SelectNotificationCallback? selectCallback}) async{
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
     const settings = InitializationSettings(
       android:android,
     );
     await _notification.initialize(
         settings,
-        onSelectNotification: (payload) async {
-          onNotifications.add(payload);
-        }
+        onSelectNotification: selectCallback,
     );
   }
 
@@ -35,7 +33,6 @@ class NotificationService {
     //   // FilePathAndroidBitmap(bigPicturePath),
     //   // largeIcon: FilePathAndroidBitmap(largeIconPath),
     // );
-
     return const NotificationDetails(
       android: AndroidNotificationDetails(
           'channel id',
@@ -60,4 +57,6 @@ class NotificationService {
           await _notificationDetails(),
           payload: payload
       );
+
+
 }

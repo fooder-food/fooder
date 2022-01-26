@@ -12,6 +12,7 @@ import 'package:flutter_notification/ui/pages/list/edit_list.dart';
 import 'package:flutter_notification/ui/pages/list/list.dart';
 import 'package:flutter_notification/ui/pages/list/list_info.dart';
 import 'package:flutter_notification/ui/pages/main/main.dart';
+import 'package:flutter_notification/ui/pages/notifications/notification.dart';
 import 'package:flutter_notification/ui/pages/profile/edit_profile.dart';
 import 'package:flutter_notification/ui/pages/profile/profile.dart';
 import 'package:flutter_notification/ui/pages/report/report.dart';
@@ -74,6 +75,7 @@ class FooderRoute {
     FooderAllReviewScreen.routeName: (ctx) => const FooderAllReviewScreen(),
     FooderRestaurantEditReviewScreen.routeName: (ctx) => const FooderRestaurantEditReviewScreen(),
     FooderViewAllImages.routeName: (ctx) => const FooderViewAllImages(),
+    FooderNotificationScreen.routeName: (ctx) => const FooderNotificationScreen(),
   };
 
   //route factory

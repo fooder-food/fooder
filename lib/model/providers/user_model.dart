@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_notification/core/service/storage/storage_service.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 import '../auth_model.dart';
 import '../user_model.dart';
@@ -22,6 +23,7 @@ class AuthModel extends ChangeNotifier {
 
   Future<void> logoutUser() async {
     _user = null;
+    OneSignal.shared.removeExternalUserId();
     await StorageService().remove("user");
     notifyListeners();
   }
