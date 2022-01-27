@@ -82,6 +82,7 @@ void setupLocator(){
   getIt.registerSingleton(NotificationCountModel());
 }
 Future<void> _initPlatform() async {
+
   const String oneSignalAppId = '646548d6-1afc-4403-b2c2-b102eae04e91';
   OneSignal.shared.setAppId(oneSignalAppId);
   OneSignal.shared.setNotificationOpenedHandler((OSNotificationOpenedResult result) {

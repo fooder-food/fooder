@@ -329,7 +329,7 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
             callPhoneButton(state),
           restaurantExtraInfo(state),
           const Divider(),
-          reportSection(),
+          reportSection(state),
           const Divider(),
           commentSection(state),
         ],
@@ -1019,11 +1019,13 @@ class _FooderRestaurantInfoScreenState extends State<FooderRestaurantInfoScreen>
     );
   }
 
-  Widget reportSection() {
+  Widget reportSection(RestaurantDetailsState state) {
     final textTheme = Theme.of(context).textTheme;
     return InkWell(
       onTap: () {
-        Navigator.of(context).pushNamed('/report');
+        Navigator.of(context).pushNamed('/report', arguments: {
+          "uniqueId": state.restaurant!.uniqueId,
+        });
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
